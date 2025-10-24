@@ -1,0 +1,1 @@
+allow gatekeeperd same_process_hal_file:file { map read open getattr execute };

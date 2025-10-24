@@ -1,0 +1,33 @@
+//
+//  SPDX-FileCopyrightText: The Android Open Source Project
+//  SPDX-FileCopyrightText: The LineageOS Project
+//  SPDX-License-Identifier: Apache-2.0
+//
+
+android_app {
+    name: "RealmeParts",
+
+    // Include SettingsLib and it's dependencies
+    defaults: ["SettingsLibDefaults"],
+
+    srcs: ["src/**/*.java"],
+    resource_dirs: ["res"],
+
+    manifest: "AndroidManifest.xml",
+
+    platform_apis: true,
+    certificate: "platform",
+    system_ext_specific: true,
+    privileged: true,
+
+    static_libs: [
+        "androidx.core_core",
+        "androidx.preference_preference",
+        "SettingsLibPreference",
+        "org.lineageos.settings.resources",
+    ],
+
+    optimize: {
+        proguard_flags_files: ["proguard.flags"],
+    },
+}

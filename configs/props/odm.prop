@@ -1,0 +1,18 @@
+# Media
+odm.dirac.path=/odm/etc/dirac
+ro.odm.build.media_performance_class=31
+
+# NFC
+ro.camera.notify_nfc=1
+
+# Sensor
+persist.sys.enable_mtk_scp_dump=1
+persist.sys.oppo.fusionlight=true
+persist.sys.oppo.proximity=true
+ro.vendor.oplus.sensor.report_brightness=true
+
+# Oplus
+persist.version.confidential=false
+ro.build.release_type=true
+ro.oplus.image.odm.version=version_stub.f62907f3
+ro.version.confidential=false

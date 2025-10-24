@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+     SPDX-FileCopyrightText: The Android Open Source Project
+     SPDX-FileCopyrightText: The LineageOS Project
+     SPDX-License-Identifier: Apache-2.0
+-->
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <PreferenceCategory
+        android:key="graphics"
+        android:title="@string/display_title">
+
+        <com.realme.realmeparts.SecureSettingListPreference
+            android:icon="@drawable/ic_cabc"
+            android:key="cabc"
+            android:dialogTitle="@string/cabc_dialogTitle"
+            android:entries="@array/cabc_profiles"
+            android:entryValues="@array/cabc_values"
+            android:defaultValue="0"
+            android:title="@string/cabc_title" />
+
+        <SwitchPreference
+            android:icon="@drawable/dc_mode_icon"
+            android:key="dc"
+            android:summary="@string/dc_mode_summary"
+            android:title="@string/dc_mode_title" />
+
+        <SwitchPreference
+            android:icon="@drawable/srgb_mode_icon"
+            android:key="srgb"
+            android:summary="@string/srgb_mode_summary"
+            android:title="@string/srgb_mode_title" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:key="speaker"
+        android:title="@string/speaker_category">
+
+        <Preference
+            android:key="clear_speaker_settings" 
+            android:icon="@drawable/ic_speaker_cleaner_icon"
+            android:title="@string/clear_speaker_title"
+            android:summary="@string/clear_speaker_summary">
+            <intent
+                 android:action="android.intent.action.MAIN"
+                 android:targetPackage="com.realme.realmeparts"
+                 android:targetClass="com.realme.realmeparts.speaker.ClearSpeakerActivity"/>
+        </Preference>
+
+    </PreferenceCategory> 
+
+    <PreferenceCategory
+        android:key="misc"
+        android:title="@string/misc_title">
+
+        <SwitchPreference
+            android:icon="@drawable/usb_otg_icon"
+            android:key="otg"
+            android:summary="@string/otg_mode_summary"
+            android:title="@string/otg_mode_title" />
+
+        <Preference
+            android:key="mtk_engineer"
+            android:icon="@drawable/ic_engineer"
+            android:title="@string/engineer_mode_title"
+            android:summary="@string/engineer_mode_summary">
+            <intent android:action="android.intent.action.MAIN"
+                 android:targetPackage="com.mediatek.engineermode"
+                 android:targetClass="com.mediatek.engineermode.EngineerMode"/>
+        </Preference>
+    </PreferenceCategory>
+</PreferenceScreen>

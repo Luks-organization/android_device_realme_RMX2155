@@ -1,0 +1,5 @@
+allow mobicore system_oplus_project_prop:file { read open };
+allow mobicore system_prop:file { read open };
+
+get_prop(mobicore, system_oplus_project_prop)
+get_prop(mobicore, system_prop)

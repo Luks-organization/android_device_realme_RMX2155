@@ -1,0 +1,2 @@
+get_prop(mnld, vendor_mtk_radio_prop)
+get_prop(mnld, default_prop)

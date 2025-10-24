@@ -1,0 +1,5 @@
+allow vpud_native proc_thermal:dir { search };
+allow vpud_native default_prop:file { read open };
+
+get_prop(vpud_native, vendor_thermal_prop)
+set_prop(vpud_native, vendor_thermal_prop)

@@ -1,0 +1,4 @@
+get_prop(platform_app, bluetooth_finder_prop)
+get_prop(platform_app, system_oplus_project_prop)
+set_prop(platform_app, system_oplus_project_prop)
+set_prop(platform_app, system_oplus_audio_prop)

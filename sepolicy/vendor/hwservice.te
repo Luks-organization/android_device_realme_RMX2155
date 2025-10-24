@@ -1,0 +1,23 @@
+# Oplus Camera
+type hal_camera_oplus_hwservice, hwservice_manager_type;
+
+# Charging
+type hal_charger_oplus_hwservice, hwservice_manager_type;
+
+# CommonDcs
+type hal_commondcs_oplus_hwservice, hwservice_manager_type;
+
+# Fingerprint
+type hal_fingerprint_oplus_hwservice, hwservice_manager_type;
+
+# Orms
+type oplus_hal_ormsHal_hwservice, hwservice_manager_type, protected_hwservice;
+
+# Dolby
+type hal_dms_hwservice, hwservice_manager_type;
+
+# Performance
+type hal_performance_oplus_hwservice, hwservice_manager_type;
+
+# Oplus Radio
+type hal_mtkmodemaci_oplus_hwservice, hwservice_manager_type;

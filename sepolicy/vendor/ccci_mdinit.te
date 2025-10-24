@@ -1,0 +1,2 @@
+allow ccci_mdinit mdlog_data_file:dir search;
+allow ccci_mdinit oplus_block_device:blk_file { read open };

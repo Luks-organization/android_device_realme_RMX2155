@@ -1,0 +1,5 @@
+system_vendor_config_prop(system_oplus_project_prop)
+system_public_prop(system_oplus_audio_prop)
+system_public_prop(system_fingerprint_prop)
+system_public_prop(system_sensors_als_prop)
+system_public_prop(system_cabc_prop)

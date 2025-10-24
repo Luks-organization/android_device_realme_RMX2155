@@ -1,0 +1,39 @@
+# Audio
+persist.vendor.audio.tuning.def_path         u:object_r:vendor_audio_tuning_prop:s0
+persist.vendor.audiohal.aurisys.pcm_dump_on  u:object_r:vendor_audio_tuning_prop:s0
+persist.vendor.audiohal.p2w_dump_on          u:object_r:vendor_audio_tuning_prop:s0
+persist.vendor.audiohal.pcm_mixer_dump_on    u:object_r:vendor_audio_tuning_prop:s0
+
+# Oplus Camera
+vendor.camera.vm.parameters                  u:object_r:vendor_oplus_prop:s0
+vendor.debug.cameralog.enable                u:object_r:vendor_oplus_prop:s0
+vendor.debug.tpi.                            u:object_r:vendor_oplus_prop:s0
+vendor.oplus.camera.                         u:object_r:vendor_oplus_prop:s0
+vendor.oplus.aps.                            u:object_r:vendor_oplus_prop:s0
+vendor.oplus.enable.dump.flag                u:object_r:vendor_oplus_prop:s0
+persist.vendor.camera.privapp.list           u:object_r:vendor_oplus_prop:s0
+
+# Fingerprint
+persist.vendor.fingerprint.                  u:object_r:vendor_fingerprint_prop:s0
+persist.vendor.fp.                           u:object_r:vendor_fingerprint_prop:s0
+vendor.flash.locked                          u:object_r:vendor_fingerprint_prop:s0
+vendor.fingerprint.                          u:object_r:vendor_fingerprint_prop:s0
+
+# Oplus Radio
+persist.vendor.oplus.radio.                  u:object_r:vendor_oplus_radio_prop:s0
+ro.vendor.oplus.radio.                       u:object_r:vendor_oplus_radio_prop:s0
+vendor.oplus.radio.                          u:object_r:vendor_oplus_radio_prop:s0
+vendor.rild.                                 u:object_r:vendor_oplus_radio_prop:s0
+
+# NFC
+ro.vendor.device                             u:object_r:vendor_variant_prop:s0
+ro.vendor.device.variant                     u:object_r:vendor_variant_prop:s0
+
+# PQ
+ro.vendor.mtk_hdr_video_support              u:object_r:vendor_mtk_pq_ro_prop:s0
+
+# TEE
+vendor.tee.googlekey.status                  u:object_r:vendor_mtk_trustonic_tee_prop:s0
+
+# Light
+persist.vendor.light.                        u:object_r:vendor_persist_light_prop:s0

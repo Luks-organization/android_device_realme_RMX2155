@@ -1,0 +1,25 @@
+//
+// SPDX-FileCopyrightText: 2019 The Android Open Source Project
+// SPDX-FileCopyrightText: 2025 The LineageOS Project
+// SPDX-License-Identifier: Apache-2.0
+//
+
+cc_library_static {
+    name: "libinit_RMX2155",
+    export_include_dirs: ["include"],
+    recovery_available: true,
+    srcs: [
+        "init_RMX2155.cpp"
+    ],
+    include_dirs: [
+        "system/core/init"
+    ],
+    shared_libs: [
+        "libbase",
+        "liblog", 
+        "libfs_mgr",
+    ],
+    cflags: [
+        "-Wno-unused-parameter",
+    ],
+}

@@ -1,0 +1,2 @@
+allow bip net_dns_prop:file { read open };
+allow bip net_dns_prop:file { getattr map };

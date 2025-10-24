@@ -1,0 +1,3 @@
+net_domain(gmscore_app)
+
+allow gmscore_app vendor_oplus_prop:file { read open getattr };

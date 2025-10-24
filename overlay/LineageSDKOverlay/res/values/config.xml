@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+     SPDX-FileCopyrightText: 2025 The LineageOS Project
+     SPDX-License-Identifier: Apache-2.0
+-->
+<resources>
+
+    <!-- Whether to cleanup fingerprints upon connection to the daemon and when user switches -->
+    <bool name="config_cleanupUnusedFingerprints">false</bool>
+
+    <!-- Default value for proximity check on screen wake
+     NOTE ! - Enable for devices that have a fast response proximity sensor (ideally < 300ms)-->
+    <bool name="config_proximityCheckOnWake">true</bool>
+    <bool name="config_proximityCheckOnWakeEnabledByDefault">true</bool>
+
+    <!-- Some devices might require always setting the toggle instead of set based on current toggle
+         value. If this is the case, set this config to true to let the toggle provider always set
+         charging enabled status regardless of the current status. -->
+    <bool name="config_chargingControlToggleSetAlways">true</bool>
+
+    <!-- Considering the fact that the system might have an incorrect estimation of the time to
+         full. Set a time margin to make the device fully charged before the target time arrives.
+         The unit is minutes and the default value is 30 minutes. If you find that it is not enough
+         to make the device to be fully charged at the target time, increase the value -->
+    <integer name="config_chargingControlTimeMargin">45</integer>
+    <!-- For a device that cannot bypass battery when charging stops (that is, the battery current
+         is 0mA when charging stops), the battery will gradually discharge. So we need to make it
+         recharge when the battery level is lower than a threshold. Set this so that the device
+         will be charged between (limit - val) and limit. -->
+    <integer name="config_chargingControlBatteryRechargeMargin">3</integer>
+
+    <!-- Defines the actions shown in advanced reboot submenu -->
+    <string-array name="config_restartActionsList">
+        <item>restart</item>
+        <item>restart_recovery</item>
+        <item>restart_bootloader</item>
+        <item>restart_systemui</item>
+        <item>restart_fastboot</item>
+     </string-array>
+
+</resources>

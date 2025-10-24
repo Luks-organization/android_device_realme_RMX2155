@@ -1,0 +1,23 @@
+net_domain(gmscore_app)
+
+get_prop(gmscore_app, bluetooth_prop)
+get_prop(gmscore_app, system_adbd_prop)
+get_prop(gmscore_app, system_oplus_project_prop)
+get_prop(gmscore_app, exported_system_prop
+)
+allow gmscore_app port:tcp_socket { name_connect };
+allow gmscore_app port:udp_socket { sendto };
+
+allow gmscore_app apex_mnt_dir:dir { search open read getattr };
+allow gmscore_app linkerconfig_file:dir { search open read getattr };
+allow gmscore_app metadata_file:dir { search open read getattr };
+allow gmscore_app mirror_data_file:dir { search open read getattr };
+allow gmscore_app postinstall_mnt_dir:dir { search open read getattr };
+allow gmscore_app system_dlkm_file:dir { search open read getattr };
+allow gmscore_app vm_data_file:dir { search open read getattr };
+allow gmscore_app init_exec:lnk_file { read getattr };
+allow gmscore_app system_file:file { read open getattr };
+allow gmscore_app vendor_file:file { read open getattr };
+
+binder_call(gmscore_app, system_server)
+binder_call(gmscore_app, bluetooth_manager_service)

@@ -1,0 +1,4 @@
+allow zygote self:capability sys_nice;
+allow zygote vendor_variant_prop:file { read open map };
+
+get_prop(zygote, vendor_variant_prop)

@@ -1,0 +1,32 @@
+allow vendor_init proc:file rw_file_perms;
+allow vendor_init proc_sched_stune:file w_file_perms;
+allow vendor_init proc_swappiness:file rw_file_perms;
+allow vendor_init vendor_sysfs_usb_supply:dir { search };
+allow vendor_init vendor_sysfs_usb_supply:file w_file_perms;
+allow vendor_init vendor_sysfs_otg_switch:file w_file_perms;
+allow vendor_init vendor_proc_display:file w_file_perms;
+allow vendor_init vendor_proc_decimal:file w_file_perms;
+allow vendor_init vendor_userdir_file:dir w_dir_perms;
+allow vendor_init vendor_proc_fastchg_fw:file w_file_perms;
+allow vendor_init vts_status_prop:file { read getattr open };
+allow vendor_init mtk_radio_device:lnk_file { unlink };
+allow vendor_init nfc_data_vendor_file:dir { r_dir_perms create_dir_perms };
+allow vendor_init system_oplus_project_prop:file { read open map getattr };
+allow vendor_init system_prop:file { read getattr open };
+
+rw_dir_file(vendor_init, sysfs_leds)
+
+get_prop(vendor_init, vendor_variant_prop)
+
+set_prop(vendor_init, system_sensors_als_prop)
+set_prop(vendor_init, system_oplus_project_prop)
+set_prop(vendor_init, system_oplus_audio_prop)
+set_prop(vendor_init, vendor_audio_tuning_prop)
+set_prop(vendor_init, vendor_persist_light_prop)
+set_prop(vendor_init, vendor_oplus_radio_prop)
+set_prop(vendor_init, vendor_oplus_prop)
+set_prop(vendor_init, vendor_mtk_pq_prop)
+set_prop(vendor_init, exported_system_prop)
+set_prop(vendor_init, bluetooth_prop)
+set_prop(vendor_init, default_prop)
+set_prop(vendor_init, radio_prop)

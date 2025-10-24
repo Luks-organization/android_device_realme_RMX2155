@@ -1,0 +1,34 @@
+dontaudit untrusted_app proc:dir r_dir_perms;
+dontaudit untrusted_app proc:file r_file_perms;
+dontaudit untrusted_app sysfs:dir r_dir_perms;
+dontaudit untrusted_app sysfs:file r_file_perms;
+allow untrusted_app sysfs_devices_block:file { read };
+allow untrusted_app sysfs_batteryinfo:dir { search read };
+allow untrusted_app sysfs_batteryinfo:file { read };
+allow untrusted_app proc_gpufreq:dir { search read };
+allow untrusted_app proc_gpufreq:file { read };
+allow untrusted_app proc_cpufreq:dir { search read };
+allow untrusted_app proc_cpufreq:file { read };
+allow untrusted_app proc_asound:dir { search read };
+allow untrusted_app proc_asound:file { read };
+allow untrusted_app vendor_sysfs_gpu:dir { search read };
+allow untrusted_app vendor_sysfs_gpu:file { read };
+allow untrusted_app vendor_sysfs_battery_supply:dir { search read };
+allow untrusted_app vendor_sysfs_battery_supply:file { read };
+allow untrusted_app vendor_proc_batt_param:file { getattr read };
+allow untrusted_app vendor_proc_charger:dir { search read };
+allow untrusted_app vendor_proc_charger:file { read };
+allow untrusted_app vendor_proc_display:dir { search read };
+allow untrusted_app vendor_proc_display:file { read };
+allow untrusted_app vendor_proc_nfc_chipset:dir { search read };
+allow untrusted_app vendor_proc_nfc_chipset:file { getattr };
+allow untrusted_app vendor_proc_oplus_sensor_feature:dir { search read };
+allow untrusted_app vendor_proc_oplus_sensor_feature:file { read };
+allow untrusted_app vendor_proc_oplus_version:dir { search read };
+allow untrusted_app zygote:unix_stream_socket { getopt };
+allow untrusted_app vendor_oplus_prop:dir { search read };
+allow untrusted_app vendor_oplus_prop:file { read open map };
+
+get_prop(untrusted_app, system_oplus_project_prop)
+get_prop(untrusted_app, vendor_audio_tuning_prop)
+get_prop(appdomain, userdebug_or_eng_prop)

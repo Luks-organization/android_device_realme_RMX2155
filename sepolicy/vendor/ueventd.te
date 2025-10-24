@@ -1,0 +1,2 @@
+allow ueventd tmpfs:blk_file { getattr setattr };
+r_dir_file(ueventd, vendor_configs_file)

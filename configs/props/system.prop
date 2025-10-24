@@ -1,0 +1,128 @@
+# AEE
+ro.vendor.have_aee_feature=1
+
+# APK Verity
+ro.apk_verity.mode=2
+
+# Audio
+aaudio.mmap_exclusive_policy=2
+aaudio.mmap_policy=2
+audio.tuning.def_path=/odm/etc/audio/audio_param/.
+ro.audio.silent=0
+ro.audio.usb.period_us=16000
+ro.camera.sound.forced=0
+ro.config.hd_voicemail=1
+ro.config.media_vol_steps=25
+ro.config.vc_call_vol_steps=7
+ro.mtk_audenh_support=1
+ro.mtk_audio_lossless_support=1
+ro.mtk_besloudness_support=1
+
+# Brand
+Build.BRAND=MTK
+
+# Dalvik
+dalvik.vm.dex2oat64.enabled=true
+
+# Touch
+MultitouchMinDistance=1px
+MultitouchSettleInterval=1ms
+TapInterval=1ms
+TapSlop=1px
+touch.coverage.calibration=box
+touch.distance.calibration=none
+touch.distance.scale=0
+touch.gestureMode=spots
+touch.pressure.scale=0.001
+touch.size.bias=0
+touch.size.isSummed=0
+touch.size.scale=1
+
+# Camera
+persist.camera.HAL3.enabled=1
+persist.camera.eis.enable=1
+ro.camera.hfr.enable=1
+ro.camera.high.resolution.video.filter.enable=1
+ro.camera.ignore.input.stream.check.enable=1
+ro.camera.portrait.blur.level.enable=1
+ro.camera.temperature.limit=440
+ro.camera.videoeis.enable=
+ro.mtk_cam.mfb.ultimate=1
+ro.mtk_cam_dualzoom_support=1
+ro.mtk_cam_stereo_camera_support=0
+
+# Mediatek
+persist.vendor.mdlog.flush_log_ratio=0
+persist.vendor.pms_removable=1
+persist.vendor.vzw_device_type=0
+ro.mediatek.version.branch=alps-mp-s0.mssi1.tc16sp-pr6
+ro.support_one_handed_mode=true
+ro.vendor.mtk_cta_set=1
+ro.vendor.mtk_gwsd_support=1
+ro.vendor.mtk_omacp_support=1
+
+# WiFi
+mediatek.wlan.ctia=0
+persist.data.iwlan.ipsec.ap=1
+persist.vendor.wfc.sys_wfc_support=1
+ro.mediatek.wlan.p2p=1
+ro.mediatek.wlan.wsc=1
+wifi.direct.interface=p2p0
+wifi.interface=wlan0
+wifi.supplicant_scan_interval=15
+wifi.tethering.interface=ap0
+
+# USB
+ro.sys.usb.bicr=no
+ro.sys.usb.charging.only=yes
+ro.sys.usb.mtp.whql.enable=0
+ro.sys.usb.storage.type=mtp
+
+# ADB
+#persist.service.debuggable=1
+persist.adb.nonblocking_ffs=0
+persist.service.adb.enable=1
+#persist.sys.usb.config=mtp,adb
+
+# Hardware Features
+ro.hardware.nfc=true
+ro.hardware.gps=true
+ro.hardware.bluetooth=true
+ro.hardware.wifi=true
+
+# Zygote
+ro.zygote.preload.enable=0
+zygote.critical_window.minute=10
+
+# Radio
+persist.sys.radio.force_lte_ca=true
+persist.radio.hvolte.enable=1
+persist.radio.multisim.config=dsds
+ro.telephony.sim.count=2
+
+# RIL Powersaving
+persist.radio.add_power_save=1 
+pm.sleep_mode=1 
+ro.ril.disable.power.collapse=0
+ro.ril.fast.dormancy.rule=1 
+ro.ril.fast.dormancy.timeout=3
+ro.mot.eri.losalert.delay=1000
+
+# Media
+media.stagefright.thumbnail.prefer_hw_codecs=true
+
+# Storage
+persist.sys.fuse.passthrough.enable=true
+
+# IPO
+sys.ipo.disable=1
+sys.ipo.pwrdncap=2
+
+# iorapd
+ro.iorapd.enable=false
+
+# Charger
+ro.charger.enable_suspend=true
+
+# System properties
+ro.product.property_source_order=odm,vendor,product,system_ext,system

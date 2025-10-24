@@ -1,0 +1,144 @@
+##################################################################################
+### Copyright (C) 2018-2020 Oplus. All rights reserved.
+###
+### File: - init.oplus.rc
+###
+### ------------------------------- Revision History: ----------------------------
+### <author>                        <data>       <version>   <desc>
+##################################################################################
+
+on init
+    # Charger
+    chown system system /sys/class/oplus_chg/battery/short_c_hw_status
+    chown system system /sys/class/oplus_chg/battery/short_c_hw_feature
+    chown system system /sys/class/oplus_chg/battery/short_c_limit_chg
+    chown system system /sys/class/oplus_chg/battery/short_c_limit_rechg
+    chown system system /sys/class/oplus_chg/battery/short_ic_volt_thresh
+    chown system system /sys/class/oplus_chg/battery/short_ic_otp_status
+    chown system system /sys/class/oplus_chg/battery/short_ic_otp_value
+    chown system system /sys/class/oplus_chg/battery/ship_mode
+    chown system system /sys/class/oplus_chg/battery/cool_down
+    chown system system /sys/class/oplus_chg/battery/bcc_current
+    chown system system /sys/class/oplus_chg/battery/bcc_exception
+    chown system system /sys/class/oplus_chg/battery/call_mode
+    chown system system /sys/class/oplus_chg/battery/mmi_charging_enable
+    chown system system /sys/class/oplus_chg/battery/soc_ajust
+    chown system system /sys/class/oplus_chg/battery/voocchg_ing
+    chown system system /sys/class/oplus_chg/usb/otg_switch
+    chown system system /sys/class/oplus_chg/usb/usb_status
+    chown system system /sys/class/oplus_chg/common/mutual_cmd
+    chown system system /sys/module/oplus_chg/parameters/gauge_dbg_tbat
+    chown system system /sys/class/oplus_chg/battery/bcc_parms
+    chown system system /proc/charger/reserve_soc_debug
+    chmod 0664 /sys/class/oplus_chg/battery/short_c_hw_status
+    chmod 0664 /sys/class/oplus_chg/battery/short_c_hw_feature
+    chmod 0664 /sys/class/oplus_chg/battery/short_c_limit_chg
+    chmod 0664 /sys/class/oplus_chg/battery/short_c_limit_rechg
+    chmod 0664 /sys/class/oplus_chg/battery/short_ic_volt_thresh
+    chmod 0664 /sys/class/oplus_chg/battery/short_ic_otp_status
+    chmod 0664 /sys/class/oplus_chg/battery/short_ic_otp_value
+    chmod 0664 /sys/class/oplus_chg/battery/ship_mode
+    chmod 0664 /sys/class/oplus_chg/battery/cool_down
+    chmod 0664 /sys/class/oplus_chg/battery/bcc_current
+    chmod 0664 /sys/class/oplus_chg/battery/bcc_exception
+    chmod 0664 /sys/class/oplus_chg/battery/call_mode
+    chmod 0777 /sys/class/oplus_chg/battery/mmi_charging_enable
+    chmod 0664 /sys/class/oplus_chg/battery/soc_ajust
+    chmod 0664 /sys/class/oplus_chg/battery/voocchg_ing
+    chmod 0664 /sys/class/oplus_chg/usb/otg_switch
+    chmod 0664 /sys/class/oplus_chg/usb/usb_status
+    chmod 0664 /sys/class/oplus_chg/common/mutual_cmd
+    chmod 0664 /sys/module/oplus_chg/parameters/gauge_dbg_tbat
+    chmod 0664 /sys/class/oplus_chg/battery/bcc_parms
+    chmod 0664 /proc/charger/reserve_soc_debug
+
+    # Charger
+    write /proc/fastchg_fw_update 1
+    write /proc/ui_soc_decimal 1
+
+on fs
+    # Update touchpanel firmware in case we ship newer firmware in /odm
+    write /proc/touchpanel/tp_fw_update 0
+
+on post-fs-data
+    # Display
+    chown system system /sys/kernel/oplus_display/LCM_CABC
+    chown system system /sys/kernel/oplus_display/sau_closebl_node
+    chown system system /sys/kernel/oplus_display/hbm
+    chmod 0666 /sys/kernel/oplus_display/hbm
+    chown system system /sys/kernel/oplus_display/aod_area
+    chmod 0666 /sys/kernel/oplus_display/aod_area
+    chown system system /sys/kernel/oplus_display/panel_id
+    chmod 0664 /sys/kernel/oplus_display/panel_id
+    chown system system /sys/kernel/oplus_display/panel_serial_number
+    chmod 0666 /sys/kernel/oplus_display/panel_serial_number
+    chown system system /sys/devices/virtual/mtk_disp_mgr/mtk_disp_mgr/LCM_ESS
+    chmod 0664 /sys/devices/virtual/mtk_disp_mgr/mtk_disp_mgr/LCM_ESS
+    chown system system /sys/kernel/oplus_display/ffl_set
+    chmod 0666 /sys/kernel/oplus_display/ffl_set
+    chown system system /sys/kernel/oplus_display/notify_fppress
+    chmod 0666 /sys/kernel/oplus_display/notify_fppress
+    chown system system /sys/kernel/oplus_display/oplus_brightness
+    chmod 0666 /sys/kernel/oplus_display/oplus_brightness
+    chown system system /sys/kernel/oplus_display/oplus_max_brightness
+    chmod 0666 /sys/kernel/oplus_display/oplus_max_brightness
+    chown system system /sys/kernel/oplus_display/aod_light_mode_set
+    chmod 0666 /sys/kernel/oplus_display/aod_light_mode_set
+    chown system system /sys/kernel/oplus_display/dim_alpha
+    chmod 0666 /sys/kernel/oplus_display/dim_alpha
+    chown system system /sys/kernel/oplus_display/dimlayer_bl_en
+    chmod 0666 /sys/kernel/oplus_display/dimlayer_bl_en
+    chown system system /sys/kernel/oplus_display/dim_dc_alpha
+    chmod 0666 /sys/kernel/oplus_display/dim_dc_alpha
+    chmod 0666 /dev/oplus_display
+    chown system system /sys/kernel/oplus_display/seed
+    chmod 0666 /sys/kernel/oplus_display/seed
+
+    # Touchpanel
+    chmod 0666 /proc/touchpanel/oplus_tp_direction
+    chmod 0666 /proc/touchpanel/oplus_tp_limit_enable
+    chown system system /proc/touchpanel/oplus_tp_direction
+    chown system system /proc/touchpanel/oplus_tp_limit_enable
+
+on boot
+    # Display
+    chown system system /sys/kernel/oplus_display/dump_info
+    chown system system /sys/kernel/oplus_display/LCM_CABC
+    chown system system /sys/kernel/oplus_display/ffl_set
+    chown system system /sys/kernel/oplus_display/power_status
+    chown system system /sys/kernel/oplus_display/sau_closebl_node
+    chown system system /sys/kernel/oplus_display/esd_status
+
+    chmod 0666 /sys/kernel/oplus_display/dump_info
+    chmod 0666 /sys/kernel/oplus_display/LCM_CABC
+    chmod 0666 /sys/kernel/oplus_display/ffl_set
+    chmod 0666 /sys/kernel/oplus_display/power_status
+    chmod 0666 /sys/kernel/oplus_display/sau_closebl_node
+    chmod 0666 /sys/kernel/oplus_display/esd_status
+    chmod 0644 /data/oplus/multimedia/oplus_display_perf_list.xml
+
+# Dalvik configuration
+on post-fs && property:ro.vendor.hw.ram=4GB
+    setprop dalvik.vm.heapstartsize 8m
+    setprop dalvik.vm.heapgrowthlimit 192m
+    setprop dalvik.vm.heapsize 512m
+    setprop dalvik.vm.heaptargetutilization 0.6
+    setprop dalvik.vm.heapminfree 8m
+    setprop dalvik.vm.heapmaxfree 16m
+on post-fs && property:ro.vendor.hw.ram=6GB
+    setprop dalvik.vm.heapstartsize 16m
+    setprop dalvik.vm.heapgrowthlimit 256m
+    setprop dalvik.vm.heapsize 512m
+    setprop dalvik.vm.heaptargetutilization 0.5
+    setprop dalvik.vm.heapminfree 8m
+    setprop dalvik.vm.heapmaxfree 32m
+on post-fs && property:ro.vendor.hw.ram=8GB
+    setprop dalvik.vm.heapstartsize 24m
+    setprop dalvik.vm.heapgrowthlimit 256m
+    setprop dalvik.vm.heapsize 512m
+    setprop dalvik.vm.heaptargetutilization 0.46
+    setprop dalvik.vm.heapminfree 8m
+    setprop dalvik.vm.heapmaxfree 48m
+
+on property:sys.boot_completed=1
+    setprop vendor.powerhal.init 1

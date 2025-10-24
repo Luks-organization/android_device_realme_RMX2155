@@ -1,0 +1,19 @@
+//
+// SPDX-FileCopyrightText: 2019 The Android Open Source Project
+// SPDX-FileCopyrightText: 2025 The LineageOS Project
+// SPDX-License-Identifier: Apache-2.0
+//
+
+soong_namespace {
+    imports: [
+        "hardware/google/interfaces",
+        "hardware/google/pixel",
+        "hardware/oplus",
+    ],
+}
+
+cc_library_shared {
+    name: "libldacBT_bco",
+    vendor_available: true,
+    srcs: [],
+}

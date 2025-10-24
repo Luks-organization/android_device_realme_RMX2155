@@ -1,0 +1,11 @@
+cc_prebuilt_library_shared {
+    name: "libbinder-v32",
+    target: {
+        android_arm64: {
+            srcs: ["arm64/libbinder-v32.so"],
+        },
+    },
+    compile_multilib: "64",
+    check_elf_files: false,
+    vendor: true,
+}

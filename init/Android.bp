@@ -1,0 +1,88 @@
+//
+// SPDX-FileCopyrightText: 2019 The Android Open Source Project
+// SPDX-FileCopyrightText: 2025 The LineageOS Project
+// SPDX-License-Identifier: Apache-2.0
+//
+
+prebuilt_etc {
+    name: "init.oplus.rc",
+    src: "init.oplus.rc",
+    relative_install_path: "init/hw",
+    vendor: true,
+}
+
+prebuilt_etc {
+    name: "init.target.rc",
+    src: "init.target.rc",
+    relative_install_path: "init",
+    system_ext_specific: true,
+}
+
+prebuilt_etc {
+    name: "init.mt6785.power.rc",
+    src: "init.mt6785.power.rc",
+    relative_install_path: "init/hw",
+    vendor: true,
+}
+
+prebuilt_etc {
+    name: "init.mt6785.rc",
+    src: "init.mt6785.rc",
+    relative_install_path: "init/hw",
+    vendor: true,
+}
+
+prebuilt_etc {
+    name: "init.mt6785.usb.rc",
+    src: "init.mt6785.usb.rc",
+    relative_install_path: "init/hw",
+    vendor: true,
+}
+
+prebuilt_etc {
+    name: "init.nfc_detect.rc",
+    src: "init.nfc_detect.rc",
+    relative_install_path: "init/hw",
+    vendor: true,
+}
+
+prebuilt_etc {
+    name: "fstab.mt6785",
+    src: "fstab.mt6785",
+    required: ["fstab.mt6785_ramdisk"],
+    vendor: true,
+}
+
+prebuilt_etc {
+    name: "fstab.mt6785_ramdisk",
+    src: "fstab.mt6785",
+    filename_from_src: true,
+    ramdisk: true,
+}
+
+prebuilt_etc {
+    name: "ueventd.oplus.rc",
+    filename: "ueventd.rc",
+    src: "ueventd.oplus.rc",
+    device_specific: true,
+}
+
+prebuilt_etc {
+    name: "ueventd.mtk.rc",
+    filename: "ueventd.rc",
+    src: "ueventd.mtk.rc",
+    vendor: true,
+}
+
+prebuilt_etc {
+    name: "init.dolby.rc",
+    src: "init.dolby.rc",
+    relative_install_path: "init",
+    soc_specific: true
+}
+
+sh_binary {
+    name: "nfc_detect.sh",
+    src: "nfc_detect.sh",
+    vendor: true,
+}

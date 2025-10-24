@@ -1,0 +1,3 @@
+allow dex2oat dalvikcache_data_file:dir { search write add_name remove_name };
+allow dex2oat dalvikcache_data_file:file { create read write getattr open unlink };
+allow dex2oat system_data_file:dir { search };

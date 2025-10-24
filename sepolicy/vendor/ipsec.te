@@ -1,0 +1,3 @@
+allow ipsec self:capability2 block_suspend;
+allow ipsec self:capability dac_override;
+allow ipsec sysfs_wake_lock:file rw_file_perms;

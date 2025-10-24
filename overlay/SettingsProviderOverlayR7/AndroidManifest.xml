@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+     SPDX-FileCopyrightText: 2025 The LineageOS Project
+     SPDX-License-Identifier: Apache-2.0
+-->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.android.settingsprovider.overlay.r7">
+
+    <application android:hasCode="false" />
+
+    <overlay
+        android:targetPackage="com.android.providers.settings"
+        android:requiredSystemPropertyName="ro.product.vendor.name"
+        android:requiredSystemPropertyValue="+(RMX2151|RMX2155)"
+        android:isStatic="true"
+        android:priority="100"/>
+
+</manifest>

@@ -1,0 +1,11 @@
+# Dolby
+allow priv_app hal_dms_hwservice:hwservice_manager find;
+binder_call(priv_app, hal_dms_default)
+
+allow priv_app self:process ptrace;
+allow priv_app shell_test_data_file:dir search;
+
+get_prop(priv_app, vendor_audio_tuning_prop)
+get_prop(priv_app, system_oplus_project_prop)
+set_prop(priv_app, vendor_audio_tuning_prop)
+set_prop(priv_app, system_oplus_project_prop)

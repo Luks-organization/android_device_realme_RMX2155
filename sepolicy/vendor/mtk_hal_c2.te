@@ -1,0 +1,5 @@
+allow mtk_hal_c2 gpu_device:chr_file { read write open ioctl };
+allow mtk_hal_c2 ion_device:chr_file { read write open ioctl };
+allow mtk_hal_c2 sysfs_boot_mode:file { read getattr open };
+
+get_prop(mtk_hal_c2, default_prop)

@@ -1,0 +1,740 @@
+From dd2cadaa273d59add273473219a914e36a12af14 Mon Sep 17 00:00:00 2001
+From: StimLuks87 <san10031987san@gmail.com>
+Date: Mon, 15 Sep 2025 02:23:08 +0500
+Subject: [PATCH] patch: Mediatek media codec
+
+---
+ include/media/MediaExtractorPluginHelper.h    |  9 ++-
+ .../nuplayer/GenericSource.cpp                | 65 +++++++++++++++++++
+ .../nuplayer/NuPlayerDecoder.cpp              | 22 +++++++
+ .../nuplayer/include/nuplayer/GenericSource.h | 17 +++++
+ .../include/nuplayer/NuPlayerSource.h         |  5 ++
+ media/libstagefright/ACodec.cpp               | 60 ++++++++++++++++-
+ media/libstagefright/MediaCodecSource.cpp     | 60 +++++++++++++++++
+ media/libstagefright/SurfaceMediaSource.cpp   |  3 +-
+ .../data/media_codecs_google_video_le.xml     |  6 +-
+ .../include/media/stagefright/ACodec.h        | 23 ++++++-
+ .../media/stagefright/MediaCodecSource.h      |  5 ++
+ media/libstagefright/omx/OMXNodeInstance.cpp  |  9 ++-
+ .../omx/SimpleSoftOMXComponent.cpp            | 11 ++++
+ .../omx/SoftVideoDecoderOMXComponent.cpp      |  8 +++
+ media/mediaserver/mediaserver.rc              |  2 +-
+ media/module/extractors/ogg/OggExtractor.cpp  |  2 +
+ .../seccomp_policy/mediaswcodec-arm.policy    |  6 +-
+ services/mediaextractor/mediaextractor.rc     |  2 +-
+ 18 files changed, 303 insertions(+), 12 deletions(-)
+
+diff --git a/include/media/MediaExtractorPluginHelper.h b/include/media/MediaExtractorPluginHelper.h
+index b86f177e00..047832768b 100644
+--- a/include/media/MediaExtractorPluginHelper.h
++++ b/include/media/MediaExtractorPluginHelper.h
+@@ -165,6 +165,7 @@ public:
+     virtual media_status_t read(
+             MediaBufferHelper **buffer, const ReadOptions *options = NULL) = 0;
+     virtual bool supportsNonBlockingRead() { return false; }
++virtual const char * extractorName() { return ""; }
+ protected:
+     friend CMediaTrack *wrap(MediaTrackHelper *track);
+     MediaBufferGroupHelper *mBufferGroup;
+@@ -177,7 +178,13 @@ inline CMediaTrack *wrap(MediaTrackHelper *track) {
+     CMediaTrack *wrapper = (CMediaTrack*) malloc(sizeof(CMediaTrack));
+     wrapper->data = track;
+     wrapper->free = [](void *data) -> void {
+-        delete (MediaTrackHelper*)(data);
++        // delete MtkAVISource in ~MtkAVIExtractor
++        if (strcmp(((MediaTrackHelper*)data)->extractorName(), "MtkAVIExtractor")) {
++            delete (MediaTrackHelper*)(data);
++        } else {
++            //  stop MTKAVISource to release buffer (for mp3 clone buffer)
++            ((MediaTrackHelper*)data)->stop();
++        }
+     };
+     wrapper->start = [](void *data, CMediaBufferGroup *bufferGroup) -> media_status_t {
+         if (((MediaTrackHelper*)data)->mBufferGroup) {
+diff --git a/media/libmediaplayerservice/nuplayer/GenericSource.cpp b/media/libmediaplayerservice/nuplayer/GenericSource.cpp
+index 991c77b270..add16ee9c8 100644
+--- a/media/libmediaplayerservice/nuplayer/GenericSource.cpp
++++ b/media/libmediaplayerservice/nuplayer/GenericSource.cpp
+@@ -20,6 +20,7 @@
+ #include "GenericSource.h"
+ #include "NuPlayerDrm.h"
+ 
++#include <binder/IPCThreadState.h>
+ #include <binder/IServiceManager.h>
+ #include <cutils/properties.h>
+ #include <datasource/PlayerServiceDataSourceFactory.h>
+@@ -84,6 +85,9 @@ NuPlayer::GenericSource::GenericSource(
+     mBufferingSettings.mInitialMarkMs = kInitialMarkMs;
+     mBufferingSettings.mResumePlaybackMarkMs = kResumePlaybackMarkMs;
+     resetDataSource();
++//mtkadd+
++    init();
++//mtkadd-
+ }
+ 
+ void NuPlayer::GenericSource::resetDataSource() {
+@@ -201,6 +205,23 @@ status_t NuPlayer::GenericSource::initFromDataSource() {
+         }
+     }
+ 
++//mtkadd+
++    //for mp3 low power
++    mExtractor = extractor;
++    const char *extractorName = mExtractor->name();
++    if (extractorName != NULL
++            && !strcasecmp(extractorName, "MtkMP3Extractor")) {
++        mIsMtkMp3 = true;
++    } else if (extractorName != NULL
++            && !strcasecmp(extractorName, "CAFExtractor")) {
++        mIsMtkAlac = true;
++    }
++    if (mIsMtkMp3 && mPID < 0xffffffff) {
++        ALOGV("initFromDataSource, set mPID:%d to MtkMP3Extractor!",mPID);
++        sp<MetaData> mp3Meta = extractor->getTrackMetaData(0, mPID);
++    }
++//mtkadd-
++
+     int32_t totalBitrate = 0;
+ 
+     mMimes.clear();
+@@ -342,6 +363,10 @@ bool NuPlayer::GenericSource::isStreaming() const {
+ 
+ NuPlayer::GenericSource::~GenericSource() {
+     ALOGV("~GenericSource");
++    //mtkadd for stop toc thread before source release.
++    if ((mIsMtkMp3 || mIsMtkAlac) && mAudioTrack.mSource != NULL) {
++        mAudioTrack.mSource->stop();
++    }
+     if (mLooper != NULL) {
+         mLooper->unregisterHandler(id());
+         mLooper->stop();
+@@ -1339,6 +1364,13 @@ void NuPlayer::GenericSource::readBuffer(
+         case MEDIA_TRACK_TYPE_AUDIO:
+             track = &mAudioTrack;
+             maxBuffers = 64;
++// mtkadd+
++            // add for TS, resolve 4k video play not smooth, too many buffers will cause parse audio too long time.
++            // it will block video parse, as TS video and audio is interleave.
++            if (isTS()) {
++                maxBuffers = 8;
++            }
++// mtkadd-
+             break;
+         case MEDIA_TRACK_TYPE_SUBTITLE:
+             track = &mSubtitleTrack;
+@@ -1720,4 +1752,37 @@ void NuPlayer::GenericSource::signalBufferReturned(MediaBufferBase *buffer)
+     buffer->release(); // this leads to delete since that there is no observor
+ }
+ 
++//mtkadd+
++
++void NuPlayer::GenericSource::init() {
++    mExtractor = NULL;
++    mIsMtkMp3 = false;
++    mIsMtkAlac = false;
++    mPID = IPCThreadState::self()->getCallingPid();
++}
++
++void NuPlayer::GenericSource::setGetMp3Param(int32_t *flag, bool set) {
++    if (!set) {  //getflag
++        *flag = mIsMtkMp3 ? 1 : 0;
++        return;
++    }
++    //set flag
++    if (mIsMtkMp3 && *flag == 1) {
++        ALOGV("set mp3 codec sucessfully");
++        mExtractor->getTrackMetaData(0/*index*/, 0xffffffff/*flag*/);
++    }
++}
++
++// for TS
++bool NuPlayer::GenericSource::isTS() {
++    const char *mime = NULL;
++    if (mFileMeta != NULL && mFileMeta->findCString(kKeyMIMEType, &mime)
++            && !strcasecmp(mime, MEDIA_MIMETYPE_CONTAINER_MPEG2TS)) {
++        return true;
++    }
++    return false;
++}
++//mtkadd-
++
++
+ }  // namespace android
+diff --git a/media/libmediaplayerservice/nuplayer/NuPlayerDecoder.cpp b/media/libmediaplayerservice/nuplayer/NuPlayerDecoder.cpp
+index 1c5aaba015..03c79074b3 100644
+--- a/media/libmediaplayerservice/nuplayer/NuPlayerDecoder.cpp
++++ b/media/libmediaplayerservice/nuplayer/NuPlayerDecoder.cpp
+@@ -384,6 +384,19 @@ void NuPlayer::Decoder::onConfigure(const sp<AMessage> &format) {
+     ALOGV("onConfigure mCrypto: %p (%d)  mIsSecure: %d",
+             crypto.get(), (crypto != NULL ? crypto->getStrongCount() : 0), mIsSecure);
+ 
++//mtkadd+
++    if (!strcasecmp(mComponentName.c_str(), "OMX.MTK.AUDIO.DECODER.MP3")) {
++        int32_t mtkmp3extractorFlag = 0;
++        //get mtkmp3extractor flag
++        mSource->setGetMp3Param(&mtkmp3extractorFlag, false /*get*/);
++        if (mtkmp3extractorFlag == 1) {
++            format->setInt32("mtk-mp3extractor", 1);
++            format->setInt32("app-pid", (int32_t)mPid);
++            ALOGV("set mp3 lowpwer flag to decoder app-pid:%ld", (long)mPid);
++        }
++    }
++//mtkadd-
++
+     err = mCodec->configure(
+             format, mSurface, crypto, 0 /* flags */);
+ 
+@@ -441,6 +454,15 @@ void NuPlayer::Decoder::onConfigure(const sp<AMessage> &format) {
+ 
+     mPaused = false;
+     mResumePending = false;
++
++//mtkadd+ for mp3 lowpower
++    int32_t mtkMp3Codec = 0;
++    if (!strcasecmp(mComponentName.c_str(), "OMX.MTK.AUDIO.DECODER.MP3")
++            && format->findInt32("mtkMp3Codec", &mtkMp3Codec)) {
++        ALOGV("turn on mp3 codec lowpower mode,mtkMp3Codec:%d.",mtkMp3Codec);
++        mSource->setGetMp3Param(&mtkMp3Codec, true /*set*/); //set mp3 codec sucessfully
++    }
++//mtkadd-
+ }
+ 
+ void NuPlayer::Decoder::onSetParameters(const sp<AMessage> &params) {
+diff --git a/media/libmediaplayerservice/nuplayer/include/nuplayer/GenericSource.h b/media/libmediaplayerservice/nuplayer/include/nuplayer/GenericSource.h
+index 80e06f1dc8..cac47a3ae0 100644
+--- a/media/libmediaplayerservice/nuplayer/include/nuplayer/GenericSource.h
++++ b/media/libmediaplayerservice/nuplayer/include/nuplayer/GenericSource.h
+@@ -39,6 +39,9 @@ class IMediaSource;
+ class MediaBuffer;
+ struct MediaClock;
+ struct NuCachedSource2;
++//mtkadd+
++class IMediaExtractor;
++//mtkadd-
+ 
+ struct NuPlayer::GenericSource : public NuPlayer::Source,
+                                  public MediaBufferObserver // Modular DRM
+@@ -239,6 +242,20 @@ private:
+ 
+     status_t checkDrmInfo();
+ 
++//mtkadd+
++    pid_t mPID;
++    sp<IMediaExtractor> mExtractor;
++    bool mIsMtkMp3;
++    bool mIsMtkAlac;
++    void init();
++public:
++    virtual void setGetMp3Param(int32_t *flag, bool set);
++
++private:
++    // add for TS
++    bool isTS();
++//mtkadd-
++
+     DISALLOW_EVIL_CONSTRUCTORS(GenericSource);
+ };
+ 
+diff --git a/media/libmediaplayerservice/nuplayer/include/nuplayer/NuPlayerSource.h b/media/libmediaplayerservice/nuplayer/include/nuplayer/NuPlayerSource.h
+index bf6b539953..4d51edf1f3 100644
+--- a/media/libmediaplayerservice/nuplayer/include/nuplayer/NuPlayerSource.h
++++ b/media/libmediaplayerservice/nuplayer/include/nuplayer/NuPlayerSource.h
+@@ -159,6 +159,11 @@ protected:
+     // Modular DRM
+     void notifyDrmInfo(const sp<ABuffer> &buffer);
+ 
++public:
++    //mtkadd+
++    virtual void setGetMp3Param(int32_t *  /*flag*/, bool  /*set*/){};
++    //mtkadd-
++
+ private:
+     sp<AMessage> mNotify;
+ 
+diff --git a/media/libstagefright/ACodec.cpp b/media/libstagefright/ACodec.cpp
+index 714836652a..9ef2cb1aec 100644
+--- a/media/libstagefright/ACodec.cpp
++++ b/media/libstagefright/ACodec.cpp
+@@ -77,7 +77,7 @@ using hardware::media::omx::V1_0::Status;
+ using server_configurable_flags::GetServerConfigurableFlag;
+ 
+ enum {
+-    kMaxIndicesToCheck = 32, // used when enumerating supported formats and profiles
++    kMaxIndicesToCheck = 128, // used when enumerating supported formats and profiles
+ };
+ 
+ namespace {
+@@ -638,6 +638,10 @@ ACodec::ACodec()
+ ACodec::~ACodec() {
+ }
+ 
++status_t ACodec::setupAudioCodec(status_t err, const char *, bool, const sp<AMessage> &) {
++    return err;
++}
++
+ void ACodec::initiateSetup(const sp<AMessage> &msg) {
+     msg->setWhat(kWhatSetup);
+     msg->setTarget(this);
+@@ -1089,6 +1093,26 @@ status_t ACodec::setupNativeWindowSizeFormatAndUsage(
+     InitOMXParams(&def);
+     def.nPortIndex = kPortIndexOutput;
+ 
++//mtk add query HWC usage for decoder
++    OMX_U32 ANW_HWComposer = 0;
++    OMX_PARAM_U32TYPE param;
++    OMX_INDEXTYPE index2;
++    status_t err2 = nativeWindow->query(nativeWindow, NATIVE_WINDOW_QUEUES_TO_WINDOW_COMPOSER , (int *)&ANW_HWComposer);
++    if (OK == err2) {
++        err2 = mOMXNode->getExtensionIndex("OMX.MTK.index.param.video.ANW_HWComposer", &index2);
++        if (OK == err2) {
++            InitOMXParams(&param);
++            param.nU32 = ANW_HWComposer;
++            err2 = mOMXNode->setParameter(index2, &param, sizeof(param));
++            if (OK != err2) {
++                ALOGW("Failed to set ANW_HWComposer to OMX, ignoring (%d)", err2);
++            }
++        }
++    }
++    else {
++        ALOGW("Failed to query NW for HWC usage, ignoring: %s (%d)", strerror(-err2), -err2);
++    }
++
+     status_t err = mOMXNode->getParameter(
+             OMX_IndexParamPortDefinition, &def, sizeof(def));
+ 
+@@ -2237,6 +2261,14 @@ status_t ACodec::configureCodec(
+                     sampleRate,
+                     numChannels);
+         }
++//mtkadd+
++        if (!strcmp(mComponentName.c_str(), "OMX.MTK.AUDIO.DECODER.MP3")
++                && err == OK && setOmxReadMultiFrame(mOMXNode, msg) == OK) {
++            msg->setInt32("mtkMp3Codec", 1);
++        } else {
++            ALOGW("setOmxReadMultiFrame fail!");
++        }
++//mtkadd-
+     } else if (!strcasecmp(mime, MEDIA_MIMETYPE_AUDIO_AAC)) {
+         int32_t numChannels, sampleRate;
+         if (!msg->findInt32("channel-count", &numChannels)
+@@ -2397,6 +2429,9 @@ status_t ACodec::configureCodec(
+         } else {
+             err = setupAC4Codec(encoder, numChannels, sampleRate);
+         }
++     } else {
++        // user can choose if support mtk audio codec
++        err = setupAudioCodec(err, mime, encoder, msg);
+     }
+ 
+     if (err != OK) {
+@@ -2449,6 +2484,12 @@ status_t ACodec::configureCodec(
+         err = OK; // ignore errors
+     }
+ 
++    //set mtk parameters
++    status_t err_mtkparam = setMtkParameters(mOMXNode, msg, mIsEncoder);
++    if (err_mtkparam != OK) {
++        return err_mtkparam;
++    }
++
+     if (err == OK) {
+         err = setVendorParameters(msg);
+         if (err != OK) {
+@@ -4201,6 +4242,12 @@ status_t ACodec::setupVideoEncoder(
+     video_def->eCompressionFormat = compressionFormat;
+     video_def->eColorFormat = OMX_COLOR_FormatUnused;
+ 
++    //set mtk parameters
++    status_t err_mtkparam = setMtkParameters(mOMXNode, msg, mIsEncoder);
++    if (err_mtkparam != OK) {
++        return err_mtkparam;
++    }
++
+     err = mOMXNode->setParameter(
+             OMX_IndexParamPortDefinition, &def, sizeof(def));
+ 
+@@ -6815,6 +6862,11 @@ void ACodec::BaseState::onOutputBufferDrained(const sp<AMessage> &msg) {
+     int32_t discarded = 0;
+     msg->findInt32("discarded", &discarded);
+ 
++//   set AvSyncRefTime to omx +
++    mCodec->setAVSyncTime(mCodec->mComponentName.c_str(),buffer->meta(),
++            mCodec->mOMXNode, msg);
++//   set AvSyncRefTime to omx -
++
+     ssize_t index;
+     BufferInfo *info = mCodec->findBufferByID(kPortIndexOutput, bufferID, &index);
+     BufferInfo::Status status = BufferInfo::getSafeStatus(info);
+@@ -8177,6 +8229,12 @@ status_t ACodec::setParameters(const sp<AMessage> &params) {
+         }
+     }
+ 
++    //set mtk parameters
++    status_t err_mtkparam = setMtkParameters(mOMXNode, params, mIsEncoder);
++    if (err_mtkparam != OK) {
++        return err_mtkparam;
++    }
++
+     return setVendorParameters(params);
+ }
+ 
+diff --git a/media/libstagefright/MediaCodecSource.cpp b/media/libstagefright/MediaCodecSource.cpp
+index 2a1fc815dc..986ce09a22 100644
+--- a/media/libstagefright/MediaCodecSource.cpp
++++ b/media/libstagefright/MediaCodecSource.cpp
+@@ -51,6 +51,9 @@ const int kStopTimeoutUs = 300000; // allow 1 sec for shutting down encoder
+ // input source.
+ const int kMaxStopTimeOffsetUs = 1000000;
+ 
++static const uint32_t kQueuedBufferMax = 100;  // default queue about 1s datas before drop frames
++static const uint32_t kDropCountOnce = 30;
++
+ struct MediaCodecSource::Puller : public AHandler {
+     explicit Puller(const sp<MediaSource> &source);
+ 
+@@ -127,6 +130,15 @@ MediaCodecSource::Puller::~Puller() {
+ 
+ void MediaCodecSource::Puller::Queue::pushBuffer(MediaBufferBase *mbuf) {
+     mReadBuffers.push_back(mbuf);
++    if (mReadBuffers.size() > kQueuedBufferMax + kDropCountOnce) {
++        ALOGW("Queued buffers(%zu) > %u, dropped frames!!", mReadBuffers.size(), kQueuedBufferMax + kDropCountOnce);
++        MediaBufferBase *mbuffer;
++        while (mReadBuffers.size() > kQueuedBufferMax) {
++            if (readBuffer(&mbuffer)) {
++                mbuffer->release();
++            }
++        }
++    }
+ }
+ 
+ bool MediaCodecSource::Puller::Queue::readBuffer(MediaBufferBase **mbuf) {
+@@ -208,6 +220,7 @@ void MediaCodecSource::Puller::stopSource() {
+ void MediaCodecSource::Puller::pause() {
+     Mutexed<Queue>::Locked queue(mQueue);
+     queue->mPaused = true;
++    queue->flush();
+ }
+ 
+ void MediaCodecSource::Puller::resume() {
+@@ -473,6 +486,10 @@ MediaCodecSource::MediaCodecSource(
+       mPausePending(false),
+       mFirstSampleTimeUs(-1LL),
+       mGeneration(0) {
++// add for mtk avoid timeUs back when resume after pause.
++    mLastTimeUs = -1ll;
++    mFrameDropped = false;
++// ~add for mtk
+     CHECK(mLooper != NULL);
+ 
+     if (!(mFlags & FLAG_USE_SURFACE_INPUT)) {
+@@ -730,6 +747,16 @@ status_t MediaCodecSource::feedEncoderInputBuffers() {
+ 
+             timeUs += mInputBufferTimeOffsetUs;
+ 
++// add for mtk avoid timeUs back when resume after pause.
++            if (timeUs <= mLastTimeUs) {
++                ALOGW("%s mLastTimeUs(%lld us)>= timeUs(%lld us),release buffer!!!",
++                        mIsVideo ? "video" : "audio", (long long)mLastTimeUs, (long long)timeUs);
++                mbuf->release();
++                mAvailEncoderInputIndices.push_back(bufferIndex);  // available input buffer not use, push back
++                continue;
++            }
++//  ~add for mtk
++
+             // push decoding time for video, or drift time for audio
+             if (mIsVideo) {
+                 mDecodingTimeQueue.push_back(timeUs);
+@@ -793,6 +820,10 @@ status_t MediaCodecSource::feedEncoderInputBuffers() {
+         status_t err = mEncoder->queueInputBuffer(
+                 bufferIndex, 0, size, timeUs, flags);
+ 
++// add for mtk avoid timeUs back when resume after pause.
++        mLastTimeUs = timeUs;
++//  ~add for mtk
++
+         if (err != OK) {
+             return err;
+         }
+@@ -976,6 +1007,30 @@ void MediaCodecSource::onMessageReceived(const sp<AMessage> &msg) {
+                         // Timestamp offset is already adjusted in GraphicBufferSource.
+                         // GraphicBufferSource is supposed to discard samples
+                         // queued before start, and offset timeUs by start time
++// add for mtk avoid timeUs back when resume after pause.
++                        if (timeUs <= mLastTimeUs) {
++                            ALOGW("video mLastTimeUs(%lld us)> timeUs(%lld us),release buffer!!!",
++                                    (long long)mLastTimeUs, (long long)timeUs);
++                            mbuf->release();
++                            mEncoder->releaseOutputBuffer(index);
++                            mFrameDropped = true;
++                            mEncoder->requestIDRFrame();
++                            break;
++                        } else {
++                            int32_t isSync = false;
++                            if (flags & MediaCodec::BUFFER_FLAG_SYNCFRAME) {
++                                isSync = true;
++                            }
++                            if (mFrameDropped && !isSync) {
++                                ALOGD("Wait IDR frame after droped video frames");
++                                mbuf->release();
++                                mEncoder->releaseOutputBuffer(index);
++                                break;
++                            }
++                            mFrameDropped = false;
++                        }
++
++//  ~add for mtk
+                         CHECK_GE(timeUs, 0LL);
+                         // TODO:
+                         // Decoding time for surface source is unavailable,
+@@ -1003,6 +1058,11 @@ void MediaCodecSource::onMessageReceived(const sp<AMessage> &msg) {
+                             timeUs, timeUs / 1E6, driftTimeUs);
+                 }
+                 mbuf->meta_data().setInt64(kKeyTime, timeUs);
++// add for mtk avoid timeUs back when resume after pause.
++                if (mFlags & FLAG_USE_SURFACE_INPUT) {
++                    mLastTimeUs = timeUs;
++                }
++//  ~add for mtk
+             } else {
+                 mbuf->meta_data().setInt64(kKeyTime, 0LL);
+                 mbuf->meta_data().setInt32(kKeyIsCodecConfig, true);
+diff --git a/media/libstagefright/SurfaceMediaSource.cpp b/media/libstagefright/SurfaceMediaSource.cpp
+index d7370551e0..a299d04880 100644
+--- a/media/libstagefright/SurfaceMediaSource.cpp
++++ b/media/libstagefright/SurfaceMediaSource.cpp
+@@ -59,8 +59,7 @@ SurfaceMediaSource::SurfaceMediaSource(uint32_t bufferWidth, uint32_t bufferHeig
+ 
+     BufferQueue::createBufferQueue(&mProducer, &mConsumer);
+     mConsumer->setDefaultBufferSize(bufferWidth, bufferHeight);
+-    mConsumer->setConsumerUsageBits(GRALLOC_USAGE_HW_VIDEO_ENCODER |
+-            GRALLOC_USAGE_HW_TEXTURE);
++    mConsumer->setConsumerUsageBits(GRALLOC_USAGE_HW_VIDEO_ENCODER);
+ 
+     sp<ISurfaceComposer> composer(ComposerService::getComposerService());
+ 
+diff --git a/media/libstagefright/data/media_codecs_google_video_le.xml b/media/libstagefright/data/media_codecs_google_video_le.xml
+index d7c65706d6..0e029c5fb5 100644
+--- a/media/libstagefright/data/media_codecs_google_video_le.xml
++++ b/media/libstagefright/data/media_codecs_google_video_le.xml
+@@ -35,7 +35,7 @@
+         </MediaCodec>
+         <MediaCodec name="OMX.google.h264.decoder" type="video/avc">
+             <!-- profiles and levels:  ProfileHigh : Level51 -->
+-            <Limit name="size" min="2x2" max="2048x2048" />
++            <Limit name="size" min="2x2" max="2400x1080" />
+             <Limit name="alignment" value="2x2" />
+             <Limit name="block-size" value="16x16" />
+             <Limit name="block-count" range="1-16384" />
+@@ -45,7 +45,7 @@
+         </MediaCodec>
+         <MediaCodec name="OMX.google.hevc.decoder" type="video/hevc">
+             <!-- profiles and levels:  ProfileMain : MainTierLevel51 -->
+-            <Limit name="size" min="2x2" max="2048x2048" />
++            <Limit name="size" min="2x2" max="2400x1080" />
+             <Limit name="alignment" value="2x2" />
+             <Limit name="block-size" value="8x8" />
+             <Limit name="block-count" range="1-65536" />
+@@ -54,7 +54,7 @@
+             <Feature name="adaptive-playback" />
+         </MediaCodec>
+         <MediaCodec name="OMX.google.vp8.decoder" type="video/x-vnd.on2.vp8">
+-            <Limit name="size" min="2x2" max="2048x2048" />
++            <Limit name="size" min="2x2" max="2400x1080" />
+             <Limit name="alignment" value="2x2" />
+             <Limit name="block-size" value="16x16" />
+             <Limit name="block-count" range="1-8192" /> <!-- max 2048x1024 -->
+diff --git a/media/libstagefright/include/media/stagefright/ACodec.h b/media/libstagefright/include/media/stagefright/ACodec.h
+index a4d82ab2b0..9153b306ef 100644
+--- a/media/libstagefright/include/media/stagefright/ACodec.h
++++ b/media/libstagefright/include/media/stagefright/ACodec.h
+@@ -114,6 +114,27 @@ struct ACodec : public AHierarchicalStateMachine, public CodecBase {
+ 
+ protected:
+     virtual ~ACodec();
++    virtual status_t setupAudioCodec(
++            status_t err, const char *mime, bool encoder, const sp<AMessage> &msg);
++    virtual status_t setOmxReadMultiFrame(const sp<IOMXNode> & /*omxNode*/,
++                const sp<AMessage> & /*msg*/) {
++                ALOGD("virtual setOmxReadMultiFrame");
++                return BAD_VALUE;
++    };
++
++    virtual status_t setMtkParameters(const sp<IOMXNode> & /*omxNode*/,
++            const sp<AMessage> & /*params*/, bool /*isEncoder*/) {
++        ALOGD("virtual setMtkParameters");
++        return OK;
++    };
++
++    //mtkadd set AvSyncRefTime to omx
++    virtual status_t setAVSyncTime(const char* /*componentName*/,
++            const sp<AMessage> /*bufferMeta*/,
++            const sp<IOMXNode> & /*omxNode*/,
++            const sp<AMessage> & /*msg*/) {
++        return OK;
++    };
+ 
+ private:
+     struct BaseState;
+@@ -596,7 +617,7 @@ private:
+     void addKeyFormatChangesToRenderBufferNotification(sp<AMessage> &notify);
+     void sendFormatChange();
+ 
+-    status_t getPortFormat(OMX_U32 portIndex, sp<AMessage> &notify);
++    virtual status_t getPortFormat(OMX_U32 portIndex, sp<AMessage> &notify);
+ 
+     void signalError(
+             OMX_ERRORTYPE error = OMX_ErrorUndefined,
+diff --git a/media/libstagefright/include/media/stagefright/MediaCodecSource.h b/media/libstagefright/include/media/stagefright/MediaCodecSource.h
+index 0f7b5354af..554fabeac0 100644
+--- a/media/libstagefright/include/media/stagefright/MediaCodecSource.h
++++ b/media/libstagefright/include/media/stagefright/MediaCodecSource.h
+@@ -162,6 +162,11 @@ private:
+     int32_t mGeneration;
+ 
+     DISALLOW_EVIL_CONSTRUCTORS(MediaCodecSource);
++
++// add for mtk avoid timeUs back when resume after pause.
++    int64_t mLastTimeUs;
++    bool mFrameDropped;
++// ~add for mtk
+ };
+ 
+ } // namespace android
+diff --git a/media/libstagefright/omx/OMXNodeInstance.cpp b/media/libstagefright/omx/OMXNodeInstance.cpp
+index 458ac9c9e4..751b30396d 100644
+--- a/media/libstagefright/omx/OMXNodeInstance.cpp
++++ b/media/libstagefright/omx/OMXNodeInstance.cpp
+@@ -155,6 +155,11 @@ struct BufferMeta {
+             return;
+         }
+ 
++        // add NULL check to avoid memcpy on freed buffer
++        if (header == NULL) {
++            return;
++        }
++
+         // check component returns proper range
+         sp<ABuffer> codec = getBuffer(header, true /* limit */);
+ 
+@@ -589,7 +594,9 @@ status_t OMXNodeInstance::freeNode() {
+ 
+         case OMX_StateLoaded:
+         {
+-            freeActiveBuffers();
++            if (mActiveBuffers.size() > 0) {
++                freeActiveBuffers();
++            }
+             FALLTHROUGH_INTENDED;
+         }
+         case OMX_StateInvalid:
+diff --git a/media/libstagefright/omx/SimpleSoftOMXComponent.cpp b/media/libstagefright/omx/SimpleSoftOMXComponent.cpp
+index 44415aa8c5..a34a6db6c0 100644
+--- a/media/libstagefright/omx/SimpleSoftOMXComponent.cpp
++++ b/media/libstagefright/omx/SimpleSoftOMXComponent.cpp
+@@ -487,6 +487,17 @@ void SimpleSoftOMXComponent::onSendCommand(
+ }
+ 
+ void SimpleSoftOMXComponent::onChangeState(OMX_STATETYPE state) {
++// Fix AOSP timing issue +++
++    // Timing issue.
++    // If binder die comes, When freeBuffer do not complete.
++    // But onChangeState() called by freeNode() is called after all buffer freed.
++    // At this time, state == OMX_StateLoaded. mState ==  OMX_StateLoaded.
++    // So there is no need to do something when state == mState.
++    if (state == mState) {
++        ALOGE("Warnning: state==mState, mState = %d, mTargetState=%d", state, mTargetState);
++        return;
++    }
++// Fix AOSP timing issue ---
+     ALOGV("%p requesting change from %d to %d", this, mState, state);
+     // We shouldn't be in a state transition already.
+ 
+diff --git a/media/libstagefright/omx/SoftVideoDecoderOMXComponent.cpp b/media/libstagefright/omx/SoftVideoDecoderOMXComponent.cpp
+index 4ab5d10609..dc228aa28c 100644
+--- a/media/libstagefright/omx/SoftVideoDecoderOMXComponent.cpp
++++ b/media/libstagefright/omx/SoftVideoDecoderOMXComponent.cpp
+@@ -507,6 +507,14 @@ OMX_ERRORTYPE SoftVideoDecoderOMXComponent::internalSetParameter(
+                 ALOGE("b/22885421");
+                 return OMX_ErrorBadParameter;
+             }
++            // 20150126 Marcus Huang: Fix ALPS01919422; limits the max width/height
++            //@Vdec_drv_if_public.c
++            //  DEC_MAX_WIDTH = 2400;
++            //  DEC_MAX_HEIGHT = 1080;
++            if ((newWidth * newHeight) > (2400 * 1080)) {
++                ALOGE("frame size is not supported (%d x %d)", newWidth, newHeight);
++                return OMX_ErrorUnsupportedSetting;
++            }
+             if (newWidth != oldWidth || newHeight != oldHeight) {
+                 bool outputPort = (newParams->nPortIndex == kOutputPortIndex);
+                 if (outputPort) {
+diff --git a/media/mediaserver/mediaserver.rc b/media/mediaserver/mediaserver.rc
+index 90f35f9d04..9ee4d6dbec 100644
+--- a/media/mediaserver/mediaserver.rc
++++ b/media/mediaserver/mediaserver.rc
+@@ -4,6 +4,6 @@ on property:init.svc.media=*
+ service media /system/bin/mediaserver
+     class main
+     user media
+-    group audio camera inet net_bt net_bt_admin net_bw_acct drmrpc mediadrm
++    group audio camera inet net_bt net_bt_admin net_bw_acct drmrpc mediadrm readproc
+     ioprio rt 4
+     task_profiles ProcessCapacityHigh HighPerformance
+diff --git a/media/module/extractors/ogg/OggExtractor.cpp b/media/module/extractors/ogg/OggExtractor.cpp
+index 4c106b278d..7bc3cd56de 100644
+--- a/media/module/extractors/ogg/OggExtractor.cpp
++++ b/media/module/extractors/ogg/OggExtractor.cpp
+@@ -1027,6 +1027,7 @@ void MyOggExtractor::buildTableOfContents() {
+     Page page;
+     ssize_t pageSize;
+     while ((pageSize = readPage(offset, &page)) > 0) {
++        if ((page.mFlags & 1) == 0) {
+         mTableOfContents.push();
+ 
+         TOCEntry &entry =
+@@ -1035,6 +1036,7 @@ void MyOggExtractor::buildTableOfContents() {
+         entry.mPageOffset = offset;
+         entry.mTimeUs = getTimeUsOfGranule(page.mGranulePosition);
+ 
++        }
+         offset += (size_t)pageSize;
+     }
+ 
+diff --git a/services/mediacodec/seccomp_policy/mediaswcodec-arm.policy b/services/mediacodec/seccomp_policy/mediaswcodec-arm.policy
+index 92f0745954..736b6a5564 100644
+--- a/services/mediacodec/seccomp_policy/mediaswcodec-arm.policy
++++ b/services/mediacodec/seccomp_policy/mediaswcodec-arm.policy
+@@ -63,6 +63,7 @@ exit_group: 1
+ restart_syscall: 1
+ rt_sigreturn: 1
+ getrandom: 1
++# libc_malloc_debug -> libc
+ madvise: 1
+ 
+ # crash dump policy additions
+@@ -85,6 +86,9 @@ getgid32: 1
+ getegid32: 1
+ getgroups32: 1
+ sysinfo: 1
+-setsockopt: 1
++# asan only policy
++readlink: 1
++# ubsan only policy
++open: 1
+ 
+ @include /apex/com.android.media.swcodec/etc/seccomp_policy/code_coverage.arm.policy
+diff --git a/services/mediaextractor/mediaextractor.rc b/services/mediaextractor/mediaextractor.rc
+index 4fb50d0a62..3b72a9755a 100644
+--- a/services/mediaextractor/mediaextractor.rc
++++ b/services/mediaextractor/mediaextractor.rc
+@@ -1,6 +1,6 @@
+ service mediaextractor /system/bin/mediaextractor
+     class main
+     user mediaex
+-    group drmrpc mediadrm
++    group drmrpc mediadrm readproc
+     ioprio rt 4
+     task_profiles ProcessCapacityHigh
+-- 
+2.34.1
+

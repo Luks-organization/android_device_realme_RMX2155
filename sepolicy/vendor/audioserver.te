@@ -1,0 +1,14 @@
+hal_client_domain(audioserver, hal_dms)
+
+allow audioserver audio_device:chr_file r_file_perms;
+allow audioserver audio_service:service_manager { find };
+allow audioserver unlabeled:file { read write open getattr };
+allow hal_audio_default hal_audio_default:process { execmem };
+allow audioserver unlabeled:dir { search };
+
+allow audioserver vendor_mtk_audio_prop:file { read open getattr map };
+allow audioserver vendor_mtk_audio_prop:property_service set;
+allow audioserver vendor_mtk_audiohal_prop:file { read open getattr map };
+allow audioserver vendor_mtk_audiohal_prop:property_service set;
+allow audioserver vendor_default_prop:file { read open getattr map };
+allow audioserver vendor_default_prop:property_service set;

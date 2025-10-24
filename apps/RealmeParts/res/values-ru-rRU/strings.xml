@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 
+     SPDX-FileCopyrightText: The Android Open Source Project
+     SPDX-FileCopyrightText: The LineageOS Project
+     SPDX-License-Identifier: Apache-2.0
+-->
+
+<resources>
+    <string name="device_title">RealmeParts</string>
+    <string name="device_summary">Настройки для устройств Realme</string>
+
+    <!-- Display -->
+    <string name="display_title">Дисплей</string>
+
+    <!-- CABC -->
+    <string name="cabc_title">Режим CABC</string>
+    <string name="cabc_dialogTitle">Профили</string>
+    <string name="cabc_off">Выключен</string>
+    <string name="cabc_normal">Включен</string>
+    <string name="cabc_balanced">Сбалансированный</string>
+    <string name="cabc_aggressive">Энергосбережение</string>
+
+    <!-- DC dimming -->
+    <string name="dc_mode_summary">DC-димминг снижает нагрузку на глаза при слабом освещении, но может ухудшить качество изображения и цветопередачу.</string>
+    <string name="dc_mode_title">DC-димминг</string>
+    <string name="tile_dc_mode">DC-димминг</string>
+
+    <!-- srgb mode -->
+    <string name="srgb_mode_summary">Режим sRGB для упрощенной цветопередачи</string>
+    <string name="srgb_mode_title">Режим sRGB</string>
+    <string name="tile_srgb_mode">sRGB</string>
+
+    <!-- Speaker -->
+    <string name="speaker_category">Динамик</string>
+
+    <!-- Clear Speaker -->
+    <string name="clear_speaker_title">Очистка динамика</string>
+    <string name="clear_speaker_summary">Воспроизвести 30-и секундный звук для очистки динамика</string>
+    <string name="clear_speaker_description">Используйте эту функцию 1-2 раза, если динамик слегка засорен пылью. Установите громкость на максимум.\n\nПри сильном загрязнении запустите функцию 2-5 раз, встряхивая устройство динамиком вниз.\n\nВНИМАНИЕ: Убедитесь, что наушники отключены.</string>
+
+    <!-- Misc -->
+    <string name="misc_title">Прочее</string>
+
+    <!-- otg mode -->
+    <string name="otg_mode_summary">Включить питание USB-OTG для внешних наушников и флэш-накопителей</string>
+    <string name="otg_mode_title">Включить USB-OTG</string>
+    <string name="tile_otg_mode">Включить USB-OTG</string>
+
+    <!-- MTK Engineer Mode-->
+    <string name="engineer_mode_title">Инженерное меню MTK</string>
+    <string name="engineer_mode_summary">Не изменяйте параметры, в которых не разбираетесь</string>
+
+    <!-- Unsupported -->
+    <string name="unsupported">Неподдерживаемый</string>
+</resources>

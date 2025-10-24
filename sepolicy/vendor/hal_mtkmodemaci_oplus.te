@@ -1,0 +1,37 @@
+type hal_mtkmodemaci_oplus, domain;
+type hal_mtkmodemaci_oplus_exec, exec_type, vendor_file_type, file_type;
+
+init_daemon_domain(hal_mtkmodemaci_oplus)
+
+hwbinder_use(hal_mtkmodemaci_oplus)
+add_hwservice(hal_mtkmodemaci_oplus, hal_mtkmodemaci_oplus_hwservice)
+
+allow hal_mtkmodemaci_oplus hal_audio_default:dir { search };
+allow hal_mtkmodemaci_oplus proc_version:file r_file_perms;
+allow hal_mtkmodemaci_oplus hal_audio_default:file rw_file_perms;
+allow hal_mtkmodemaci_oplus hwservicemanager_prop:file { read open map getattr};
+allow hal_mtkmodemaci_oplus vendor_proc_oplus_version:file r_file_perms;
+allow hal_mtkmodemaci_oplus vendor_oplus_radio_prop:file { read open map getattr};
+
+allow hal_mtkmodemaci_oplus hwservicemanager:hwservice_manager { find add };
+allow hal_mtkmodemaci_oplus hal_mtkmodemaci_oplus_hwservice:hwservice_manager { add };
+allow hal_mtkmodemaci_oplus hal_mtkmodemaci_oplus_hwservice:hwservice_manager { add };
+
+binder_call(hal_mtkmodemaci_oplus, rild)
+allow hal_mtkmodemaci_oplus rild:dir { search };
+allow hal_mtkmodemaci_oplus rild:file { open read getattr };
+allow hal_mtkmodemaci_oplus rild:fd use;
+allow hal_mtkmodemaci_oplus rild:unix_stream_socket { connectto read write };
+allow hal_mtkmodemaci_oplus radio_service:sock_file { write getattr };
+
+allow hal_mtkmodemaci_oplus self:rawip_socket { create ioctl };
+allow hal_mtkmodemaci_oplus self:udp_socket { create };
+allow hal_mtkmodemaci_oplus self:tcp_socket { create };
+
+allow hal_mtkmodemaci_oplus radio_data_file:dir { search write add_name remove_name };
+allow hal_mtkmodemaci_oplus radio_data_file:file { create read write open getattr setattr unlink };
+allow hal_mtkmodemaci_oplus netd:udp_socket { read write };
+
+set_prop(hal_mtkmodemaci_oplus, radio_prop)
+set_prop(hal_mtkmodemaci_oplus, vendor_mtk_radio_prop)
+set_prop(hal_mtkmodemaci_oplus, vendor_oplus_radio_prop)

@@ -1,0 +1,6 @@
+# IMS needs to read settings
+allow radio system_app_data_file:dir r_dir_perms;
+allow radio system_app_data_file:file r_file_perms;
+allow radio user_profile_data_file:dir r_dir_perms;
+
+binder_call(radio, hal_mtkmodemaci_oplus)

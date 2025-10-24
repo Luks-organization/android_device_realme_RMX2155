@@ -1,0 +1,8 @@
+# Charging
+type oplus_charger_device, dev_type, fs_type;
+
+# Sensors
+type virtual_sensor_device, dev_type;
+
+# Oplus block device
+type oplus_block_device, dev_type;
