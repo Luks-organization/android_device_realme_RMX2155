@@ -4,6 +4,5 @@ allow system_server proc_partition:file getattr;
 allow system_server system_user_mode_emulation_prop:file { read open };
 allow system_server isolated_compute_app:unix_stream_socket getopt;
 
-get_prop(system_server, wifi_hal_prop)
 get_prop(system_server, system_user_mode_emulation_prop)
-set_prop(system_server, system_oplus_audio_prop)
+get_prop(system_server, wifi_hal_prop)

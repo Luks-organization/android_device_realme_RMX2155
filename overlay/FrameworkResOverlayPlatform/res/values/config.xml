@@ -323,11 +323,10 @@
     <!-- Allow automatic adjusting of the screen brightness while dozing in low power state. -->
     <bool name="config_allowAutoBrightnessWhileDozing">true</bool>
 
-    <!-- If device supports pickup/lift gesture -->
+    <!-- Whether device supports sensor based doze customizations -->
     <bool name="config_dozePulsePickup">true</bool>
-
-    <!-- If AOD can show an ambient version of the wallpaper -->
-    <bool name="config_dozeSupportsAodWallpaper">true</bool>
+    <bool name="config_dozePulseProximity">true</bool>
+    <bool name="config_deviceHaveWakeUpProximity">true</bool>
 
     <!-- If this is true, the screen will come on when you unplug usb/power/whatever. -->
     <bool name="config_unplugTurnsOnScreen">true</bool>

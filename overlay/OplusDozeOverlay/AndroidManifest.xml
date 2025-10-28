@@ -9,8 +9,8 @@
     <application android:hasCode="false" />
 
     <overlay 
-        android:targetPackage="com.android.settings"
+        android:targetPackage="org.lineageos.settings.doze"
         android:isStatic="true"
-        android:priority="600"/>
+        android:priority="6969"/>
 
 </manifest>

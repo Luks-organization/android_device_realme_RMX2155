@@ -14,27 +14,27 @@ unzip vendor/realme/RMX2155/proprietary/odm/lib64/libstfaceunlockppl.zip -d vend
 #curl https://github.com/Nothing-2A/android_system_core/commit/0d5990a96c5e6a404887f5575c5d00bcbbaaef74.patch | git am
 #cd ../../
 
-echo "- Applying Aperture Mediatek HFPS Mode Patch"
-cd packages/apps/Aperture
-curl https://github.com/Nothing-2A/android_packages_apps_Aperture/commit/9509277efc852ad8bdcce204e0d9cfe104b6d190.patch | git am
-cd ../../../
+#echo "- Applying Aperture Mediatek HFPS Mode Patch"
+#cd packages/apps/Aperture
+#curl https://github.com/Nothing-2A/android_packages_apps_Aperture/commit/9509277efc852ad8bdcce204e0d9cfe104b6d190.patch | git am
+#cd ../../../
 
 # Apply patch
-cd device/realme/RMX2155/patches && ./apply.sh && cd && cd evo
+#cd device/realme/RMX2155/patches && ./apply.sh && cd && cd evo
 
 # Make the build faster using ccache
 #export CCACHE_EXEC=/usr/bin/ccache
 
-export USE_CCACHE=1
-export CCACHE_DIR=~/.ccache
-export CCACHE_COMPRESS=1
-export CCACHE_COMPRESSLEVEL=6
+#export USE_CCACHE=1
+#export CCACHE_DIR=~/.ccache
+#export CCACHE_COMPRESS=1
+#export CCACHE_COMPRESSLEVEL=6
 
-ccache -M 40G
-ccache -o compression=true
-ccache -o hard_link=true
-ccache -o max_files=200000
-ccache -o depend_mode=true
+#ccache -M 40G
+#ccache -o compression=true
+#ccache -o hard_link=true
+#ccache -o max_files=200000
+#ccache -o depend_mode=true
 
 # Disable and stop systemd-oomd service.
-systemctl disable --now systemd-oomd && sudo apt-get purge systemd-oomd -y
+#systemctl disable --now systemd-oomd && sudo apt-get purge systemd-oomd -y

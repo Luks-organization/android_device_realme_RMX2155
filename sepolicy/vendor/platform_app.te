@@ -2,26 +2,17 @@ allow platform_app hal_dms_hwservice:hwservice_manager find;
 binder_call(platform_app, hal_dms_default)
 get_prop(platform_app, audio_config_prop)
 hal_client_domain(platform_app, hal_dms)
-allow platform_app system_oplus_audio_prop:file { read open };
 
-# Camera
-binder_call(platform_app, mtk_hal_camera)
-binder_call(platform_app, hal_performance_oplus)
-
+allow platform_app shell_data_file:dir { search read };
 allow platform_app shell_data_file:file r_file_perms;
-allow platform_app shell_data_file:dir r_dir_perms;
 allow platform_app zygote:unix_stream_socket getopt;
 allow platform_app hal_performance_oplus_hwservice:hwservice_manager find;
 
-# UVC
-allow platform_app usb_uvc_enabled_prop:file { read open };
+get_prop(platform_app, system_oplus_project_prop)
+get_prop(platform_app, vendor_audio_tuning_prop)
 
+# Camera
 r_dir_file(platform_app, persist_data_file)
 r_dir_file(platform_app, persist_camera_file)
-
-get_prop(platform_app, audio_config_prop)
-get_prop(platform_app, usb_uvc_enabled_prop)
-get_prop(platform_app, system_oplus_project_prop)
-
-get_prop(platform_app, vendor_audio_tuning_prop)
-set_prop(platform_app, vendor_audio_tuning_prop)
+binder_call(platform_app, mtk_hal_camera)
+binder_call(platform_app, hal_performance_oplus)

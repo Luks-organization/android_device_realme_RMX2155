@@ -47,13 +47,11 @@ lib_fixups: lib_fixups_user_type = {
         'android.hardware.graphics.allocator@2.0',
         'android.hardware.graphics.allocator@3.0',
         'android.hardware.graphics.allocator@4.0',
-        'android.hardware.keymaster-V3-ndk_platform',
         'vendor.oplus.hardware.performance@1.0',
         'vendor.oplus.hardware.biometrics.fingerprint@2.1',
     ): lib_fixup_odm_suffix,
     (
         'vendor.mediatek.hardware.lbs@1.0',
-        'vendor.mediatek.hardware.videotelephony@1.0',
         'vendor.oplus.hardware.commondcs@1.0',
         'libremosaiclib',
         'libremosaic_wrapper',
@@ -70,8 +68,8 @@ blob_fixups: blob_fixups_user_type = {
     'vendor/etc/vintf/manifest/manifest_media_c2_V1_2_default.xml': blob_fixup()
        .regex_replace('1.1', '1.2')
        .regex_replace('@1.0', '@1.2'),
-    'vendor/etc/vintf/manifest/manifest_hwcomposer.xml': blob_fixup()
-       .regex_replace('2.2', '2.3'),
+    'vendor/lib64/hw/hwcomposer.mt6785.so': blob_fixup()
+       .add_needed('libprocessgroup_shim.so'),
     'system_ext/etc/init/kpoc_charger.rc': blob_fixup()
        .regex_replace('/system', '/system_ext'),
     (
@@ -170,12 +168,18 @@ blob_fixups: blob_fixups_user_type = {
        .add_needed('libbinder-v32.so'),
     'vendor/lib64/hw/android.hardware.sensors@2.X-subhal-mediatek.so': blob_fixup()
        .add_needed('android.hardware.sensors@1.0-convert-shared.so'),
+    (
+     'vendor/lib/libnvram.so',
+     'vendor/lib64/libnvram.so',
+     'vendor/lib64/libsysenv.so'
+    ): blob_fixup()
+       .add_needed('libbase_shim.so'),
 }  # fmt: skip
 
 module = ExtractUtilsModule(
     'RMX2155',
     'realme',
-    blob_fixups=blob_fixups,
+    #blob_fixups=blob_fixups,
     lib_fixups=lib_fixups,
     namespace_imports=namespace_imports,
     add_firmware_proprietary_file=True,

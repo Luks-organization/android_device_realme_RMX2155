@@ -8,7 +8,6 @@ allow system_app privapp_data_file:dir search;
 
 get_prop(system_app, system_oplus_project_prop)
 set_prop(system_app, system_oplus_project_prop)
-set_prop(system_app, system_oplus_audio_prop)
 
 # Call
 binder_call(system_app, system_suspend)

@@ -15,7 +15,7 @@ prebuilt_etc {
     name: "init.target.rc",
     src: "init.target.rc",
     relative_install_path: "init",
-    system_ext_specific: true,
+    vendor: true,
 }
 
 prebuilt_etc {
@@ -49,15 +49,8 @@ prebuilt_etc {
 prebuilt_etc {
     name: "fstab.mt6785",
     src: "fstab.mt6785",
-    required: ["fstab.mt6785_ramdisk"],
     vendor: true,
-}
-
-prebuilt_etc {
-    name: "fstab.mt6785_ramdisk",
-    src: "fstab.mt6785",
-    filename_from_src: true,
-    ramdisk: true,
+    ramdisk_available: true,
 }
 
 prebuilt_etc {
@@ -79,6 +72,125 @@ prebuilt_etc {
     src: "init.dolby.rc",
     relative_install_path: "init",
     soc_specific: true
+}
+
+prebuilt_etc {
+    name: "factory_init.connectivity.common.rc",
+    src: "factory_init.connectivity.common.rc",
+    relative_install_path: "init/hw",
+    vendor: true,
+}
+
+prebuilt_etc {
+    name: "factory_init.connectivity.rc",
+    src: "factory_init.connectivity.rc",
+    relative_install_path: "init/hw",
+    vendor: true,
+}
+
+prebuilt_etc {
+    name: "factory_init.project.rc",
+    src: "factory_init.project.rc",
+    relative_install_path: "init/hw",
+    vendor: true,
+}
+
+prebuilt_etc {
+    name: "factory_init.rc",
+    src: "factory_init.rc",
+    relative_install_path: "init/hw",
+    vendor: true,
+}
+
+prebuilt_etc {
+    name: "init.connectivity.common.rc",
+    src: "init.connectivity.common.rc",
+    relative_install_path: "init/hw",
+    vendor: true,
+}
+
+prebuilt_etc {
+    name: "init.connectivity.rc",
+    src: "init.connectivity.rc",
+    relative_install_path: "init/hw",
+    vendor: true,
+}
+
+prebuilt_etc {
+    name: "init.modem.rc",
+    src: "init.modem.rc",
+    relative_install_path: "init/hw",
+    vendor: true,
+}
+
+prebuilt_etc {
+    name: "init.project.rc",
+    src: "init.project.rc",
+    relative_install_path: "init/hw",
+    vendor: true,
+}
+
+prebuilt_etc {
+    name: "init.sensor_1_0.rc",
+    src: "init.sensor_1_0.rc",
+    relative_install_path: "init/hw",
+    vendor: true,
+}
+
+prebuilt_etc {
+    name: "init_connectivity.rc",
+    src: "init_connectivity.rc",
+    relative_install_path: "init/hw",
+    vendor: true,
+}
+
+prebuilt_etc {
+    name: "meta_init.connectivity.common.rc",
+    src: "meta_init.connectivity.common.rc",
+    relative_install_path: "init/hw",
+    vendor: true,
+}
+
+prebuilt_etc {
+    name: "meta_init.connectivity.rc",
+    src: "meta_init.connectivity.rc",
+    relative_install_path: "init/hw",
+    vendor: true,
+}
+
+prebuilt_etc {
+    name: "meta_init.modem.rc",
+    src: "meta_init.modem.rc",
+    relative_install_path: "init/hw",
+    vendor: true,
+}
+
+prebuilt_etc {
+    name: "meta_init.project.rc",
+    src: "meta_init.project.rc",
+    relative_install_path: "init/hw",
+    vendor: true,
+}
+
+prebuilt_etc {
+    name: "meta_init.rc",
+    src: "meta_init.rc",
+    relative_install_path: "init/hw",
+    vendor: true,
+}
+
+prebuilt_etc {
+    name: "multi_init.rc",
+    src: "multi_init.rc",
+    relative_install_path: "init/hw",
+    vendor: true,
+}
+
+prebuilt_etc {
+    name: "init.cabc.rc",
+    src: "init.cabc.rc",
+    relative_install_path: "init",
+    system_ext_specific: true
 }
 
 sh_binary {

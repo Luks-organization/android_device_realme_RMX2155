@@ -52,7 +52,6 @@ on init
     chmod 0664 /sys/class/oplus_chg/battery/bcc_parms
     chmod 0664 /proc/charger/reserve_soc_debug
 
-    # Charger
     write /proc/fastchg_fw_update 1
     write /proc/ui_soc_decimal 1
 
@@ -100,6 +99,10 @@ on post-fs-data
     chown system system /proc/touchpanel/oplus_tp_direction
     chown system system /proc/touchpanel/oplus_tp_limit_enable
 
+    # Disable round limit
+    write /proc/touchpanel/oplus_tp_direction 1
+    write /proc/touchpanel/oplus_tp_limit_enable 0
+
 on boot
     # Display
     chown system system /sys/kernel/oplus_display/dump_info
@@ -116,29 +119,3 @@ on boot
     chmod 0666 /sys/kernel/oplus_display/sau_closebl_node
     chmod 0666 /sys/kernel/oplus_display/esd_status
     chmod 0644 /data/oplus/multimedia/oplus_display_perf_list.xml
-
-# Dalvik configuration
-on post-fs && property:ro.vendor.hw.ram=4GB
-    setprop dalvik.vm.heapstartsize 8m
-    setprop dalvik.vm.heapgrowthlimit 192m
-    setprop dalvik.vm.heapsize 512m
-    setprop dalvik.vm.heaptargetutilization 0.6
-    setprop dalvik.vm.heapminfree 8m
-    setprop dalvik.vm.heapmaxfree 16m
-on post-fs && property:ro.vendor.hw.ram=6GB
-    setprop dalvik.vm.heapstartsize 16m
-    setprop dalvik.vm.heapgrowthlimit 256m
-    setprop dalvik.vm.heapsize 512m
-    setprop dalvik.vm.heaptargetutilization 0.5
-    setprop dalvik.vm.heapminfree 8m
-    setprop dalvik.vm.heapmaxfree 32m
-on post-fs && property:ro.vendor.hw.ram=8GB
-    setprop dalvik.vm.heapstartsize 24m
-    setprop dalvik.vm.heapgrowthlimit 256m
-    setprop dalvik.vm.heapsize 512m
-    setprop dalvik.vm.heaptargetutilization 0.46
-    setprop dalvik.vm.heapminfree 8m
-    setprop dalvik.vm.heapmaxfree 48m
-
-on property:sys.boot_completed=1
-    setprop vendor.powerhal.init 1

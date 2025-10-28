@@ -1,7 +1,5 @@
-# Dolby
-hal_client_domain(system_server, hal_dms)
-
 dontaudit system_server proc:file getattr;
+
 allow system_server binderfs_logs_transactions:file r_file_perms;
 allow system_server proc_buddyinfo:file getattr;
 allow system_server proc_ccci_dump:file getattr;
@@ -28,15 +26,15 @@ allow system_server proc_thermal:file getattr;
 allow system_server proc_timer:file getattr;
 allow system_server proc_ufs_debug:file getattr;
 allow system_server proc_uptime:file getattr;
-allow system_server proc_zoneinfo:file getattr;
 allow system_server proc_zraminfo:file getattr;
 allow system_server proc_gpufreq:dir search;
 allow system_server proc_irq:dir search;
 allow system_server proc_gz_log:file getattr;
-allow system_server vendor_proc_charger:dir search;
+allow system_server vendor_proc_charger:dir { search read };
 allow system_server vendor_proc_charger:file getattr;
-allow system_server vendor_proc_display:dir search;
-allow system_server vendor_proc_oplus_sensor_als:dir search;
+allow system_server vendor_proc_display:dir { search read };
+allow system_server vendor_proc_display:file r_file_perms;
+allow system_server vendor_proc_oplus_sensor_als:dir { search read };
 allow system_server vendor_proc_oplus_sensor_feature:dir search;
 allow system_server vendor_proc_oplus_version:dir search;
 allow system_server vendor_proc_decimal:file getattr;
@@ -48,10 +46,9 @@ allow system_server vendor_sysfs_usb_supply:file { read open };
 allow system_server vendor_sysfs_usb_supply:file { getattr setattr };
 allow system_server vendor_variant_prop:file { read open };
 allow system_server vendor_proc_batt_param:file getattr;
-allow system_server vendor_audio_tuning_prop:file { read open map getattr };
-
-allow system_server system_file:dir map;
 
 get_prop(system_server, vendor_variant_prop)
-get_prop(system_server, vendor_audio_tuning_prop)
-get_prop(system_server, system_oplus_project_prop)
+set_prop(system_server, vendor_audio_tuning_prop)
+
+# Dolby
+hal_client_domain(system_server, hal_dms)

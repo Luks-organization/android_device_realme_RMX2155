@@ -11,6 +11,10 @@ ro.oplus.camera.                                 u:object_r:exported_system_prop
 vendor.oplus.                                    u:object_r:exported_system_prop:s0
 vendor.oppo.                                     u:object_r:exported_system_prop:s0
 
+# Audio
+audio.tuning.def_path                            u:object_r:system_oplus_audio_prop:s0
+sys.oplus.mm.                                    u:object_r:system_oplus_audio_prop:s0
+
 # GPS
 ro.oplus.mtk_gps_L1L5                            u:object_r:exported_system_prop:s0
 ro.oplus.mtk_gps_mpe                             u:object_r:exported_system_prop:s0
@@ -18,8 +22,6 @@ ro.oplus.mtk_gps_mpe                             u:object_r:exported_system_prop
 # Market name
 ro.product.marketname                            u:object_r:system_oplus_project_prop:s0
 ro.oplus.market.name                             u:object_r:system_oplus_project_prop:s0
-ro.vendor.oplus.market.name                      u:object_r:system_oplus_project_prop:s0
-vendor.usb.product_string                        u:object_r:system_oplus_project_prop:s0
 
 # Version
 ro.separate.soft                                 u:object_r:system_oplus_project_prop:s0
@@ -30,10 +32,6 @@ ro.oplus.image.                                  u:object_r:system_oplus_project
 oplus.fingerprint.                               u:object_r:system_fingerprint_prop:s0
 oplus.optical.                                   u:object_r:system_fingerprint_prop:s0
 gf.debug.                                        u:object_r:system_fingerprint_prop:s0
-
-# Audio 
-sys.oplus.mm.                                    u:object_r:system_oplus_audio_prop:s0
-audio.tuning.def_path                            u:object_r:system_oplus_audio_prop:s0
 
 # Als Sensors
 vendor.sensors.als_correction.                   u:object_r:system_sensors_als_prop:s0
@@ -47,9 +45,6 @@ persist.oplus.network.                           u:object_r:exported_system_prop
 
 # Hardware
 ro.hardware.chipname                             u:object_r:exported_default_prop:s0
-
-# Crdroid
-ro.crdroid.version	                             u:object_r:build_prop:s0
 
 # SVN
 ro.build.version.svn                             u:object_r:build_prop:s0

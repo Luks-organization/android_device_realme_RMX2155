@@ -5,13 +5,10 @@ import /vendor/etc/init/hw/init.mt6785.power.rc
 import /vendor/etc/init/hw/init.mt6785.usb.rc
 import /vendor/etc/init/hw/init.nfc_detect.rc
 import /vendor/etc/init/hw/init.project.rc
-import /FWUpgradeInit.rc
-import /vendor/etc/init/hw/init.volte.rc
-import /vendor/etc/init/hw/init.mal.rc
 import /vendor/etc/init/hw/init.sensor_1_0.rc
 import /vendor/etc/init/hw/init.oplus.rc
-import /vendor/etc/init/hw/init.stnfc.rc
-import /system/etc/init/hw/init.stnfc.rc
+import /vendor/etc/init/init.target.rc
+import /vendor/etc/init/init.volte_ua.rc
 
 # init.modem.rc must be the LAST rc file because vold.post_fs_data_done is set in it
 import /vendor/etc/init/hw/init.modem.rc
@@ -47,6 +44,9 @@ on late-init
     write /sys/kernel/rcu_expedited 1
 
 on charger
+    start charger
+    start vendor.lineage.health-service.default
+
     write /sys/devices/platform/10012000.dvfsrc_top/helio-dvfsrc/dvfsrc_debug "kir_emi -1"
     chmod 0660 /dev/spm
     chown system system /dev/spm
@@ -77,17 +77,22 @@ on charger
 
     # Turn backlight on and switch to backlight trigger
     write /sys/class/leds/lcd-backlight/brightness "1000"
-    write /sys/class/leds/lcd-backlight/trigger "backlight"
+    write /sys/class/leds/lcd-backlight/trigger "backlight-drm"
+
+    start vendor.light-default
 
     # Stop bootprof
     write /proc/bootprof "0"
+
+    # Display
+    chmod 0660 /dev/graphics/fb0
+    chown system graphics /dev/graphics/fb0
 
 on early-fs
     write /proc/bootprof "INIT:early-fs"    
 
 on fs
     write /proc/bootprof "INIT:fs"
-    wait_for_prop hwservicemanager.ready "true"
     start vendor.boot-hal-1-2
     write /proc/bootprof "INIT:Mount_START"
     write /sys/kernel/tracing/trace_marker "B|1|Mount"
@@ -369,10 +374,6 @@ on post-fs-data
     chown radio system /sys/devices/platform/mt-pmic/low_battery_protect_stop
     chown radio system /sys/devices/platform/mt-pmic/low_battery_protect_ut
 
-    #MDDB
-    mkdir /data/vendor_de/meta 0770 system system
-    mkdir /data/vendor_de/meta/mddb 0770 system system
-
     chmod 0660 /data/misc/acdapi/calib.dat
     chmod 0660 /data/misc/acdapi/param.dat
     chmod 0660 /data/misc/acdapi/sensors.dat
@@ -424,10 +425,6 @@ on post-fs-data
 
     #EM eint
     chown root diag /sys/bus/platform/drivers/eint/current_eint
-
-    # Display
-    chmod 0660 /dev/graphics/fb0
-    chown system graphics /dev/graphics/fb0
 
     chmod 0660 /dev/mtk_disp_mgr
     chown system graphics /dev/mtk_disp_mgr
@@ -669,10 +666,6 @@ on post-fs-data
 
 on zygote-start
     write /proc/bootprof "INIT:zygote-start"
-    #ifdef OPLUS_FEATURE_TP_BSPFWUPDATE
-    #Xuhang.Li@bsp.tp.basic , 2021/08/20, add for bspFwUpdate
-    start bspFwUpdate
-    #endif/*OPLUS_FEATURE_TP_BSPFWUPDATE*/
 
 on early-boot
     write /proc/bootprof "INIT:early-boot"
@@ -681,7 +674,6 @@ on early-boot
 on boot
     write /proc/bootprof "INIT:boot"
 
-    write /proc/sys/vm/dirty_writeback_centisecs 300
     chmod 0660 /sys/power/autosleep
 
     chmod 0664 /sys/class/leds/lcd-backlight/brightness
@@ -867,16 +859,12 @@ on boot
     chmod 660 /dev/ttyGS1
     chown system radio /dev/ttyGS1
 
-    # OTG
-    write /sys/class/power_supply/usb/otg_switch 1
-
     # Fingerprint
     chmod 0660 /dev/goodix_fp
     chown system system /dev/goodix_fp
 
-    # Disable round limit
-    write /proc/touchpanel/oplus_tp_limit_enable 0
-    write /proc/touchpanel/oplus_tp_direction 1
+    # OTG
+    write /sys/class/power_supply/usb/otg_switch 1
 
     # Power HAL
     setprop vendor.powerhal.init 1

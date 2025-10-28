@@ -25,8 +25,4 @@ allow init socket_device:sock_file { setattr unlink };
 
 get_prop(init, system_cabc_prop)
 get_prop(init, system_oplus_project_prop)
-get_prop(init, system_oplus_audio_prop)
 get_prop(init, vendor_variant_prop)
-get_prop(init, vendor_oplus_prop)
-get_prop(init, exported_system_prop)
-get_prop(init, vendor_audio_tuning_prop)

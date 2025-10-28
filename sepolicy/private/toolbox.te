@@ -1,3 +1,4 @@
 allow toolbox resourcecache_data_file:dir { search read open };
-allow toolbox resourcecache_data_file:dir { getattr setattr };
-allow toolbox resourcecache_data_file:file { getattr setattr };
+
+get_prop(toolbox, resourcecache_data_file)
+set_prop(toolbox, resourcecache_data_file)

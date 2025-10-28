@@ -1,0 +1,24 @@
+##################################################################################
+### Copyright (C) 2025 The LineageOS Project
+###
+### File: - init.cabc.rc
+###
+### ------------------------------- Revision History: ----------------------------
+### <author>                        <data>       <version>   <desc>
+##################################################################################
+
+# CABC off
+on property:persist.cabc_profile=0
+    write /sys/kernel/oplus_display/LCM_CABC 0
+
+# CABC on
+on property:persist.cabc_profile=1
+    write /sys/kernel/oplus_display/LCM_CABC 1
+
+# CABC balanced
+on property:persist.cabc_profile=2
+    write /sys/kernel/oplus_display/LCM_CABC 2
+
+# CABC aggressive
+on property:persist.cabc_profile=3
+    write /sys/kernel/oplus_display/LCM_CABC 3
